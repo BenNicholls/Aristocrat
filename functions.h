@@ -14,17 +14,10 @@ NOTES
 #include <vector>
 #include <string>
 
-vector<Move> moveGen(Position);
-
-void movelistOutput(vector<Move>);
 
 double perft(Position, int);
 
 int eval(Position);
-
-int searchW(Position, int, int, int);
-
-int searchB(Position, int, int, int);
 
 int search(Position, int, int, int);
 

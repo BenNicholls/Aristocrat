@@ -44,4 +44,3 @@ const string RANKNAMES[12] = {"", "", "8", "7", "6", "5", "4", "3", "2", "1", ""
 
 const int SLIDEMOVES[8] = { -11, -9, 11, 9, -10, 1, 10, -1 };
 const int KNIGHTMOVES[8] = { -21, -19, -8, 12, 21, 19, 8, -12 };
-const int KINGMOVES[8] = { -11, -10, -9, 1, 11, 10, 9, -1 };

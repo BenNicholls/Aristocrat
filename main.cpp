@@ -38,16 +38,11 @@ using namespace std;
 
 int main(){
 
-    Position Game("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    Position Game("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 0");
     Game.output();
 
-	vector<Move> movelist1 = moveGen(Game);
-	Game.toMove = BLACK;
-	vector<Move> movelist2 = moveGen(Game);
-
-	movelistOutput(movelist1);
-	cout << endl;
-	movelistOutput(movelist2);
+	double moves = perft(Game, 1);
+	cout << moves;
 
 	cin.ignore();
     return 0;

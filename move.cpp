@@ -20,20 +20,7 @@ using namespace std;
 //Dummy constructor to fool stupid arrays and functions and whatever
 Move::Move() {}
 
-//Constructor for regular moves
-Move::Move(int f, int t, int p, int c) {
-	fromSpace = f;
-	toSpace = t;
-	piece = p;
-	capture = c;
-	enPassant = 0;
-	castle = 0;
-	jump = 0;
-	promotion = 0;
-}
-
-//Constructor for weird moves (en passant, promotions, all that jazz)
-Move::Move(int f, int t, int p, int c, bool en, int ca, bool ju, int pr) {
+Move::Move(int f, int t, int p, int c, bool en, int ca, bool ju, int pr, int o_ep, int o_fif) {
 	fromSpace = f;
 	toSpace = t;
 	capture = c;
@@ -42,6 +29,8 @@ Move::Move(int f, int t, int p, int c, bool en, int ca, bool ju, int pr) {
 	castle = ca;
 	jump = ju;
     promotion = pr;
+	old_ep = o_ep;
+	old_fifty = o_fif;
 }
 
 //Outputs the move in long notation, along with a blurb about promotions and whatnot

@@ -6,38 +6,28 @@
 NOTES
 	- Nothing to see here folks.
 **********************************************************************************/
-
-#include "position.h"
-#include <iostream>
-#include "functions.h"
 #include <vector>
-#include "definitions.h"
 #include <string>
+#include <iostream>
+#include "position.h"
+#include "functions.h"
+#include "definitions.h"
+#include "movelist.h"
 
 using namespace std;
 
-//Nice little function to print out the contents of any vector of moves. Good for testing!
-void movelistOutput(vector<Move> movelist) {
-	if (movelist.size() == 0) cout << "No moves! Checkmate?";
-	else for (unsigned int i = 0; i < movelist.size(); i++) movelist[i].output();
-
-}
-
 //Perft function. Depth parameter should be 1 for current position, more for extra depth.
 double perft(Position Game, int depth) {
+	if (depth == 0) return 1;
 	double movecount = 0;
-	vector<Move> movelist;
-	movelist = moveGen(Game);
-	if (depth == 0) {
-		if (Game.inCheck()) return 0;
-		else return 1;
-	}
-	else {
-		for (unsigned int i = 0; i < movelist.size(); i++) {
-			Position newGame;
-			newGame = Game;
-			movecount += perft(newGame, depth - 1);
-		}
+	Movelist theMoves;
+	Game.generateMoves(theMoves);
+	for (unsigned int i = 0; i < theMoves.list.size(); i++) {
+		Position newGame;
+		newGame = Game;
+		int check = newGame.doMove(theMoves.list[i]);
+		if (check) return 0;
+		else movecount += perft(newGame, depth - 1);
 	}
 	return movecount;
 }

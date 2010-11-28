@@ -13,6 +13,7 @@ NOTES
 #include "move.h"
 #include <string>
 #include <vector>
+#include "movelist.h"
 
 using namespace std;
 
@@ -22,10 +23,10 @@ class Position {
     int board[120];                      //12x10 board, 8x8 padded for knight moves
 
     int enPassant;                      //Holds valid enpassant square, or 0
-    int castleWK;
-    int castleWQ;                        //Castle values hold 1 if allowed, zero if not
-    int castleBK;
-    int castleBQ;
+    bool castleWK;
+    bool castleWQ;                        //Castle values
+    bool castleBK;
+    bool castleBQ;
     int toMove;                           //1 for white, -1 for black
     int fiftyMove;                   //Number of half moves played
     int whiteKing;                        //Stores location of white and black king
@@ -41,7 +42,11 @@ class Position {
 	void fenParse(string);
 
     void output();
-
+	void removePiece(int, int);
+	void updatePiece(int, int, int);
     bool movePiece(Move);                 //Moves a piece. Updates board and piecelists
+	bool doMove(Move);
+	bool isAttacked(int);
 	bool inCheck();
+	void generateMoves(Movelist &);
 };
