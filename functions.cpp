@@ -3,10 +3,8 @@
                                   Functions Code
                                    functions.cpp
                             Last Updated March 14, 2009
-
 NOTES
 	- Nothing to see here folks.
-
 **********************************************************************************/
 
 #include "position.h"

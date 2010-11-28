@@ -1,7 +1,7 @@
 /*********************************************************************************
                                     Aristocrat
 								  Version  0.0.7
-						    Last Updated March 30, 2009
+						  Last Updated November 28, 2010
 
 FEATURES
 	- Board Representation: object containing 1x120 array (padded 8x8 board),
@@ -13,14 +13,9 @@ FEATURES
     - Evaluation function counts material, because that's all that's important
     - Broken ass search function that works up to depth 4, but then decides to eat
       balls.
-
-TO IMPLEMENT
-	- Fenboard parser (although the way I have it set up now should be more than
-	  fine for testing purposes
+	- Fenboard parser (no checks for FEN validity, so be careful!)
 
 PROBLEMS
-    - Oh, couldn't get stupid fenboard thing working, but that's just because I
-      was lazy and tried to copy/paste a string splitting function off the internet
     - Somehow, even when copy/pasting the old search code, Aristocrat manages to
       fuck up EVEN MORE than Sir Chess did. What the hell.
 

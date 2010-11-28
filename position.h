@@ -2,11 +2,10 @@
                                     Aristocrat
 							   Position Class Header
 									position.h
-                            Last Updated March 30, 2009
+                          Last Updated November 28, 2019
 
 NOTES
     - Position class now also holds a counter for the number of half-moves played.
-      Use this later when making up fun interface
 **********************************************************************************/
 
 #pragma once

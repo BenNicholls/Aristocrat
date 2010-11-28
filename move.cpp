@@ -7,7 +7,6 @@
 NOTES
 	- Move output now correctly supports blurbs about castling, promotion, captures,
 	  en passant, and puts a sweet x when there is a capture instead of a hyphen
-
 **********************************************************************************/
 
 #include "move.h"

@@ -30,7 +30,7 @@ const int KING = 6;
 
 const int PIECEVALUE[7] = { 0, 100, 300, 300, 500, 900, 10000 };
 
-const int INFINITY = 2147483647;
+const int INFINITY = 1000000000;
 
 const string PIECENAMES[7] = { "Empty", "Pawn", "Knight", "Bishop", "Rook", "Queen", "King" };
 

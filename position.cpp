@@ -2,7 +2,7 @@
                                     Aristocrat
 								  Position Class
                                    position.cpp
-                            Last Updated March 30, 2009
+                            Last Updated Nov 28, 2010
 
 NOTES
   - Castling, promotion, and en passant have been implemented fully, but only
