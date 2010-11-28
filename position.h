@@ -28,14 +28,18 @@ class Position {
     int castleBK;
     int castleBQ;
     int toMove;                           //1 for white, -1 for black
-    int halfMoveNumber;                   //Number of half moves played
+    int fiftyMove;                   //Number of half moves played
     int whiteKing;                        //Stores location of white and black king
     int blackKing;
+	int totalMoves;
 
     vector<int> whitePiecelist;           //Piecelists hold the position of each piece,
     vector<int> blackPiecelist;           //and a piece is simply deleted from the vector when captured
 
     Position();
+	Position(string);
+	void customSetup();
+	void fenParse(string);
 
     void output();
 

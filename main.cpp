@@ -43,15 +43,8 @@ using namespace std;
 
 int main(){
 
-	//cout << "Welcome to Aristocrat, version 0.0.0" << endl;
-    Position Game;
-//    Move aMove(84, 64, PAWN, 0, 0, 0, 1, 0);
-//    Game.movePiece(aMove);
+    Position Game("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     Game.output();
-	//for (unsigned int i = 0; i < 6; i++) {
-	//	 int score = Game.toMove*search(Game, i, -INFINITY, INFINITY);
-	//	 cout << i << ":" << score << endl;
-	//}
 
 	vector<Move> movelist1 = moveGen(Game);
 	Game.toMove = BLACK;

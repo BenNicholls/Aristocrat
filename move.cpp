@@ -14,6 +14,7 @@ NOTES
 #include <iostream>
 #include "definitions.h"
 #include <cstdlib>
+#include "functions.h"
 
 using namespace std;
 
@@ -33,7 +34,7 @@ Move::Move(int f, int t, int p, int c) {
 }
 
 //Constructor for weird moves (en passant, promotions, all that jazz)
-Move::Move(int f, int t, int p, int c, int en, int ca, int ju, int pr) {
+Move::Move(int f, int t, int p, int c, bool en, int ca, bool ju, int pr) {
 	fromSpace = f;
 	toSpace = t;
 	capture = c;
@@ -49,10 +50,10 @@ void Move::output() {
     if (castle == 1) cout << "0-0" << endl;
     else if (castle == 2) cout << "0-0-0" << endl;
     else {   
-		cout << PIECESHORT[abs(piece)] << FILES[fromSpace%10] << RANKS[9 - (fromSpace - 20)/10];
+		cout << PIECESHORT[abs(piece)] << toAlgebraic(fromSpace);
         if (capture != 0) cout << "x";
         else cout << "-";
-        cout << FILES[toSpace%10] << RANKS[9 - (toSpace - 20)/10];
+        cout << toAlgebraic(toSpace);
         if (promotion != 0) cout << "(" << PIECESHORT[promotion] << ")";
         if (abs(capture) > 1) cout << ", capturing a " << PIECENAMES[abs(capture)] << "!";
         if (abs(capture) == 1) {

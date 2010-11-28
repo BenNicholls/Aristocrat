@@ -12,6 +12,7 @@ NOTES
 
 #include "position.h"
 #include <vector>
+#include <string>
 
 vector<Move> moveGen(Position);
 
@@ -26,3 +27,6 @@ int searchW(Position, int, int, int);
 int searchB(Position, int, int, int);
 
 int search(Position, int, int, int);
+
+int fromAlgebraic(string);
+string toAlgebraic(int);

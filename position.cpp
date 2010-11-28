@@ -17,41 +17,47 @@ NOTES
 #include "definitions.h"
 #include "move.h"
 #include <vector>
+#include "functions.h"
 
-Position::Position() {
+//Position setup function. Entering "custom" sets up the position are diagrammed in Position::customSetup()
+//otherwise, it sends the input parameter to be parsed as a fen string. 
+Position::Position(string setup){
+	if (setup == "custom") customSetup();
+	else fenParse(setup);
+}
+
+//No string included? Initial position set up then.
+Position::Position(){
+	string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+	fenParse(fen);
+}
+
+void Position::customSetup() {
     toMove = WHITE;
     enPassant = 0;
     castleWK = 1;
     castleWQ = 1;
     castleBK = 1;
     castleBQ = 1;
-    halfMoveNumber = 0;
+    fiftyMove = 0;
+	totalMoves = 0;
 	
-	//Initializes board, designating spaces that are no dice
-	for (int i = 0; i<120; i++)	{  													   
-        if ((i/10) <2 || (i/10) > 9 || (i%10) == 0 || (i%10) == 9) board[i] = NOBOARD; 
-        else board[i] = EMPTY;
-    }
+	//Clears the board, sets up NOBOARD zones.
+	for (int i = 0; i < 120; i++) {
+		if (i/10 < 2 || i/10 > 9 || i%10 == 0 || i%10 == 9) board[i] = NOBOARD;
+		else board[i] = EMPTY;
+	}
 	
-	//Nice visual way to set up the board. Not too shabby!
-//    int boardsetup[64] = { -ROOK, -KNIGHT, -BISHOP, -QUEEN, -KING, -BISHOP, -KNIGHT, -ROOK, //8
-//                           -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN,          //7
-//                           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,          //6
-//                           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,          //5
-//                           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,          //4
-//                           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         //3
-//                           PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, 			    //2
-//                           ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK };       //1
-//// 							a 		b 		c 		d 	 e 		f 		g 		h
-
-	int boardsetup[64] = { EMPTY, EMPTY, -PAWN, -PAWN, -PAWN, EMPTY, EMPTY, EMPTY,
-						   EMPTY, EMPTY, EMPTY, PAWN, EMPTY, EMPTY, EMPTY, EMPTY,
-						   EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-						   EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-						   EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-						   EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-						   EMPTY, EMPTY, EMPTY, -PAWN, EMPTY, EMPTY, EMPTY, EMPTY,
-						   EMPTY, EMPTY, PAWN, PAWN, PAWN, EMPTY, EMPTY, EMPTY };
+//	Nice visual way to set up the board. Not too shabby!
+    int boardsetup[64] = { -ROOK, -KNIGHT, -BISHOP, -QUEEN, -KING, -BISHOP, -KNIGHT, -ROOK, //8
+                           -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN,          //7
+                           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,          //6
+                           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,          //5
+                           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,          //4
+                           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         //3
+                           PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, 			    //2
+                           ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK };       //1
+// 							a 		b 		c 		d 	 e 		f 		g 		h
 
 	//Throws the above position onto the board
     int loadCount = 0;
@@ -65,6 +71,88 @@ Position::Position() {
             loadCount++;
         }
     }
+}
+
+//Parses the fen string, sets up the position. WARNING: no checks are currently
+//done to validate the fen string. Make sure it is good!
+void Position::fenParse(string fen){
+
+	//Clears the board, sets up NOBOARD zones.
+	for (int i = 0; i < 120; i++) {
+		if (i/10 < 2 || i/10 > 9 || i%10 == 0 || i%10 == 9) board[i] = NOBOARD;
+		else board[i] = EMPTY;
+	}
+	
+	//Holds the cut up fen string
+	string FenPieces[13];
+	
+	//This block cuts the fen string into segments
+	int count = 0;
+	string temp = "";
+	for (unsigned int i = 0; i < fen.size(); i++){
+		if (fen[i] == ' ' || fen[i] == '/'){
+			FenPieces[count] = temp;
+			temp = "";
+			count++;
+		}
+		else temp += fen[i];
+	}
+	FenPieces[12] = temp;
+
+	///This block places the pieces into the board[120] array
+	for (unsigned int i = 0; i < 8; i++) {
+		int pos = 0;
+		for (unsigned int j = 0; j < FenPieces[i].size(); j++) {
+			int space = 21+i*10+pos;
+			switch(FenPieces[i][j]){
+				case 'r': board[space] = -ROOK; blackPiecelist.push_back(space); pos++; break;
+				case 'n': board[space] = -KNIGHT; blackPiecelist.push_back(space); pos++; break;
+				case 'b': board[space] = -BISHOP; blackPiecelist.push_back(space); pos++; break;
+				case 'q': board[space] = -QUEEN; blackPiecelist.push_back(space); pos++; break;
+				case 'k': board[space] = -KING; blackPiecelist.push_back(space); blackKing = space; pos++; break;
+				case 'p': board[space] = -PAWN; blackPiecelist.push_back(space); pos++; break;
+				case 'R': board[space] = ROOK; whitePiecelist.push_back(space); pos++; break;
+				case 'N': board[space] = KNIGHT; whitePiecelist.push_back(space); pos++; break;
+				case 'B': board[space] = BISHOP; whitePiecelist.push_back(space); pos++; break;
+				case 'Q': board[space] = QUEEN; whitePiecelist.push_back(space); pos++; break;
+				case 'K': board[space] = KING; whitePiecelist.push_back(space); whiteKing = space; pos++; break;
+				case 'P': board[space] = PAWN; whitePiecelist.push_back(space); pos++; break;
+				case '1': pos += 1; break;
+				case '2': pos += 2; break;
+				case '3': pos += 3; break;
+				case '4': pos += 4; break;
+				case '5': pos += 5; break;
+				case '6': pos += 6; break;
+				case '7': pos += 7; break;
+				case '8': pos += 8; break; 
+			}
+		}
+	}
+
+	//Assesses whos turn it is.
+	if (FenPieces[8][0] == 'w') toMove = 1;
+	else toMove = -1;
+
+	//Castling
+	castleWK = false;
+	castleWQ = false;
+	castleBK = false;
+	castleBQ = false;
+	for (unsigned int i = 0; i < FenPieces[9].size(); i++){
+		switch(FenPieces[9][i]){
+			case 'K': castleWK = true; break;
+			case 'Q': castleWQ = true; break;
+			case 'k': castleBK = true; break;
+			case 'q': castleBQ = true; break;
+		}
+	}
+
+	//Enpassant space
+	if (FenPieces[10][0] != '-') enPassant = fromAlgebraic(FenPieces[10]);
+
+	fiftyMove = atoi(FenPieces[11].c_str());
+	totalMoves = atoi(FenPieces[12].c_str());
+
 }
 
 //Outputs a fancy schmancy board, all ASCII and everything.
@@ -82,7 +170,7 @@ void Position::output() {
     else cout << "Black to move." << endl;
 }
 
-//Moves a piece. It's fucking fantastical.
+//Moves a piece. It's fucking fantastical. Returns false if move turned out to be illegal.
 bool Position::movePiece(Move theMove) {
     board[theMove.toSpace] = board[theMove.fromSpace];
     board[theMove.fromSpace] = 0;
@@ -147,21 +235,22 @@ bool Position::movePiece(Move theMove) {
         }
         if (theMove.fromSpace == blackKing) blackKing = theMove.toSpace;
 	}
-    if (theMove.enPassant == 1) board[theMove.toSpace + (10 * toMove)] = 0; //Kills the en Passanted pawn, i hope
+    if (theMove.enPassant == 1) board[theMove.toSpace + (10 * toMove)] = EMPTY; //Kills the en Passanted pawn, i hope
     if (theMove.jump == 1) enPassant = theMove.toSpace + (10 * toMove); //If there is en passanting to be done, we will know
     else enPassant = 0;
     if (theMove.promotion != 0) board[theMove.toSpace] = theMove.promotion * toMove;
 	
 	bool check = inCheck();
 	toMove = -toMove;
-	halfMoveNumber++;
+	if (theMove.capture == 0 && theMove.piece != PAWN) fiftyMove++;
+	else fiftyMove = 0;
 
 	return check;
 }
 
 bool Position::inCheck() {
 	int kingSquare;
-	if (toMove == 1) kingSquare = whiteKing;
+	if (toMove == WHITE) kingSquare = whiteKing;
 	else kingSquare = blackKing;
 
 	//attacked by pawn?

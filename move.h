@@ -15,16 +15,16 @@ class Move {
 		int score;                            //How good is move? You decide.
 		int piece;                            //Records which piece is moving
 		int capture;                          //Records which type of piece was hit
-		int enPassant;                        //1 if enpassant capture, 0 otherwise
+		bool enPassant;                        //1 if enpassant capture, 0 otherwise
 		int castle;                           //0 for no, 1 for kingside, 2 for queen
 		int promotion;                        //holds value of piece being created , or 0
-		int jump;                             //1 if pawn jumped 2 spaces, 0 if not
+		bool jump;                             //1 if pawn jumped 2 spaces, 0 if not
 
 		Move();
 
 		Move(int, int, int, int);             //Regular constructor, for normal moves
 		                                      //Crazy constructor for crazies
-		Move(int, int, int, int, int, int, int, int);
+		Move(int, int, int, int, bool, int, bool, int);
 
-		void output();                             //Outputs a description of the move
+		void output();                             //Outputs a description of the movess
 };
