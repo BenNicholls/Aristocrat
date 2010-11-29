@@ -34,12 +34,12 @@ Position::Position(){
 }
 
 void Position::customSetup() {
-    toMove = BLACK;
+    toMove = WHITE;
     enPassant = 0;
-    castleWK = 1;
-    castleWQ = 1;
-    castleBK = 1;
-    castleBQ = 1;
+    castleWK = true;
+    castleWQ = true;
+    castleBK = true;
+    castleBQ = true;
     fiftyMove = 0;
 	totalMoves = 0;
 	
@@ -50,14 +50,14 @@ void Position::customSetup() {
 	}
 	
 //	Nice visual way to set up the board. Not too shabby!
-    int boardsetup[64] = { -ROOK, EMPTY, -BISHOP, -QUEEN, -KING, -BISHOP, -KNIGHT, -ROOK, //8
-                           -PAWN, PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN,          //7
+    int boardsetup[64] = { -ROOK, -KNIGHT, -BISHOP, -QUEEN, -KING, -BISHOP, -KNIGHT, -ROOK, //8
+                           -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN,          //7
                            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,          //6
                            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,          //5
                            EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,          //4
-                           EMPTY, EMPTY, EMPTY, EMPTY, PAWN, EMPTY, EMPTY, EMPTY,         //3
-                           PAWN, -PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, 			    //2
-                           ROOK, EMPTY, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK };       //1
+                           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         //3
+                           PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, 			    //2
+                           ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK };       //1
 // 							a 		b 		c 		d 	 e 		f 		g 		h
 
 	//Throws the above position onto the board
@@ -150,10 +150,10 @@ void Position::fenParse(string fen){
 
 	//Enpassant space
 	if (FenPieces[10][0] != '-') enPassant = fromAlgebraic(FenPieces[10]);
+	else enPassant = 0;
 
 	fiftyMove = atoi(FenPieces[11].c_str());
 	totalMoves = atoi(FenPieces[12].c_str());
-
 }
 
 //Outputs a fancy schmancy board, all ASCII and everything.
@@ -171,82 +171,30 @@ void Position::output() {
     else cout << "Black to move." << endl;
 }
 
-//Moves a piece. It's fucking fantastical. Returns false if move turned out to be illegal.
-bool Position::movePiece(Move theMove) {
-    board[theMove.toSpace] = board[theMove.fromSpace];
-    board[theMove.fromSpace] = 0;
-
-	if (toMove == WHITE) {
-		for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
-			if (whitePiecelist[i] == theMove.fromSpace) whitePiecelist[i] = theMove.toSpace;
-		}
-		for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
-			if (blackPiecelist[i] == theMove.toSpace) blackPiecelist[i] = 0;
-		}
-		if (theMove.enPassant == 1) {
-		    for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
-                if (blackPiecelist[i] == theMove.toSpace + 10) blackPiecelist[i] = 0;
-            }
-		}
-		if (theMove.castle == 1) {
-		    castleWK = 0;
-		    board[98] = EMPTY;
-		    board[96] = ROOK;
-		    for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
-		        if (whitePiecelist[i] == 98) whitePiecelist[i] = 96;
-		    }
-		}
-		if (theMove.castle == 2) {
-		    castleWQ = 0;
-		    board[91] = EMPTY;
-		    board[94] = ROOK;
-		    for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
-		        if (whitePiecelist[i] == 91) whitePiecelist[i] = 94;
-		    }
-        }
-        if (theMove.fromSpace == whiteKing) whiteKing = theMove.toSpace;
+void Position::outputDetails() {
+	output();
+	cout << endl;
+	cout << "White King is on " << toAlgebraic(whiteKing) << endl;
+	cout << "Black King is on " << toAlgebraic(blackKing) << endl;
+	cout << "Castling Rights: ";
+	if (castleWK) cout << "K";
+	if (castleWQ) cout << "Q";
+	if (castleBK) cout << "k";
+	if (castleBQ) cout << "q";
+	cout << endl;
+	cout << "Fiftymove counter: " << fiftyMove << ". Total moves: " << totalMoves << endl;
+	cout << "White pieces are located on: ";
+	for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
+		cout << toAlgebraic(whitePiecelist[i]) << " ";
 	}
-	else {
-		for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
-			if (blackPiecelist[i] == theMove.fromSpace) blackPiecelist[i] = theMove.toSpace;
-		}
-		for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
-            if (whitePiecelist[i] == theMove.toSpace) whitePiecelist[i] = 0;
-		}
-		if (theMove.enPassant == 1) {
-		    for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
-                if (whitePiecelist[i] == theMove.toSpace - 10) whitePiecelist[i] = 0;
-            }
-		}
-        if (theMove.castle == 1) {
-		    castleBK = 0;
-		    board[28] = EMPTY;
-		    board[26] = -ROOK;
-		    for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
-		        if (blackPiecelist[i] == 28) blackPiecelist[i] = 26;
-		    }
-		}
-		if (theMove.castle == 2) {
-		    castleBQ = 0;
-		    board[21] = EMPTY;
-		    board[24] = -ROOK;
-		    for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
-		        if (blackPiecelist[i] == 21) blackPiecelist[i] = 24;
-		    }
-        }
-        if (theMove.fromSpace == blackKing) blackKing = theMove.toSpace;
+	cout << endl;
+	cout << "Black pieces are located on: ";
+	for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
+		cout << toAlgebraic(blackPiecelist[i]) << " ";
 	}
-    if (theMove.enPassant == 1) board[theMove.toSpace + (10 * toMove)] = EMPTY; //Kills the en Passanted pawn, i hope
-    if (theMove.jump == 1) enPassant = theMove.toSpace + (10 * toMove); //If there is en passanting to be done, we will know
-    else enPassant = 0;
-    if (theMove.promotion != 0) board[theMove.toSpace] = theMove.promotion * toMove;
-	
-	bool check = inCheck();
-	toMove = -toMove;
-	if (theMove.capture == 0 && theMove.piece != PAWN) fiftyMove++;
-	else fiftyMove = 0;
-
-	return check;
+	cout << endl;
+	if (enPassant != 0) cout << "En Passant square is: " << enPassant << endl;
+	else cout << "There is no en passant square." << endl;
 }
 
 void Position::removePiece(int space, int side) {
@@ -263,6 +211,25 @@ void Position::removePiece(int space, int side) {
 		for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
 			if (blackPiecelist[i] == space) {
 				blackPiecelist[i] = NOBOARD;
+				break;
+			}
+		}
+	}
+}
+void Position::addPiece(int space, int piece, int side) {
+	
+	if (side == WHITE) {
+		for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
+			if (whitePiecelist[i] == space) {
+				whitePiecelist[i] = piece;
+				break;
+			}
+		}
+	}
+	else {
+		for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
+			if (blackPiecelist[i] == space) {
+				blackPiecelist[i] = piece;
 				break;
 			}
 		}
@@ -301,13 +268,17 @@ bool Position::doMove(Move theMove) {
 		//For enpassant captures
 		if(theMove.enPassant == true) {
 			removePiece(enPassant, -toMove);
-			board[enPassant + 10*toMove] == EMPTY;
+			board[enPassant + 10*toMove] = EMPTY;
 		}
 		else removePiece(theMove.toSpace, -toMove);
 	}
 
+	//Speaking of en passant captures...
+	if (theMove.jump) enPassant = theMove.fromSpace - 10*toMove;
+	else enPassant = 0;
+
 	//For promotions, we must bring a piece to LIFE!
-	if (theMove.promotion != 0) board[theMove.toSpace] = -theMove.promotion;
+	if (theMove.promotion != 0) board[theMove.toSpace] = theMove.promotion*toMove;
 	
 	//Castling. Hooray. Move the rooks, update piecelists.
 	if (theMove.castle != 0) {
@@ -363,9 +334,17 @@ bool Position::doMove(Move theMove) {
 	bool check = inCheck();
 	toMove = -toMove;
 
+	//update moves made and history
+	movesMade.list.push_back(theMove);
+	WKhistory.push_back(castleWK);
+	WQhistory.push_back(castleWQ);
+	BKhistory.push_back(castleBK);
+	BQhistory.push_back(castleBQ);
+	fiftyMoveHistory.push_back(fiftyMove);
+	enPassantHistory.push_back(enPassant);
+
 	return check;
 }
-
 
 
 bool Position::inCheck() {
@@ -377,13 +356,17 @@ bool Position::inCheck() {
 
 bool Position::isAttacked(int square) {
 
-
 	//attacked by pawn?
 	if (board[square - 11*toMove] == -PAWN*toMove || board[square - 9*toMove] == -PAWN*toMove) return true;
 
 	//knight?
 	for (unsigned int j = 0; j < 8; j++) {
 		if (board[square + KNIGHTMOVES[j]] == -KNIGHT*toMove) return true;
+	}
+
+	//king?
+	for (unsigned int j = 0; j < 8; j++) {
+		if (board[square + SLIDEMOVES[j]] == -KING*toMove) return true;
 	}
 
 	//diagonals?
@@ -418,10 +401,8 @@ bool Position::isAttacked(int square) {
 
 //Generates moves for a pre-made movelist.
 void Position::generateMoves(Movelist &Moves) {
-
 	vector<int> piecelist;
-	Moves.old_fiftyMove = fiftyMove;
-	Moves.old_enPassant = enPassant;
+
 	//Load the correct piecelist
 	if (toMove == WHITE) piecelist = whitePiecelist;
 	else piecelist = blackPiecelist;
@@ -541,24 +522,24 @@ void Position::generateMoves(Movelist &Moves) {
 						if (toMove == WHITE) {
 							if (j == 5 && castleWK == true) {
 								if (board[97] == EMPTY) {
-									if (!isAttacked(97)) Moves.add_castle(1, WHITE);
+									if (!isAttacked(97) && !isAttacked(96)) Moves.add_castle(1, WHITE);
 								}
 							}
 							else if (j == 7 && castleWQ == true) {
 								if (board[93] == EMPTY && board[92] == EMPTY) {
-									if (!isAttacked(93) && !isAttacked(92)) Moves.add_castle(2, WHITE);
+									if (!isAttacked(93) && !isAttacked(94)) Moves.add_castle(2, WHITE);
 								}
 							}
 						}
 						else {
 							if (j == 5 && castleBK == true) {
 								if (board[27] == EMPTY) {
-									if (!isAttacked(27)) Moves.add_castle(1, BLACK);
+									if (!isAttacked(27) && !isAttacked(26)) Moves.add_castle(1, BLACK);
 								}
 							}
 							else if (j == 7 && castleBQ == true) {
 								if (board[23] == EMPTY && board[22] == EMPTY) {
-									if (!isAttacked(23) && !isAttacked(22)) Moves.add_castle(2, BLACK);
+									if (!isAttacked(23) && !isAttacked(24)) Moves.add_castle(2, BLACK);
 								}
 							}
 						}

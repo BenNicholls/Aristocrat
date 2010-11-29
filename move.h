@@ -20,9 +20,6 @@ class Move {
 		int promotion;                        //holds value of piece being created , or 0
 		bool jump;                             //1 if pawn jumped 2 spaces, 0 if not
 
-		int old_ep;							  //Holds previous enpassant square
-		int old_fifty;						  //Holds previous fiftymove counter
-
 		Move();
 
 		Move(int, int, int, int);             //Regular constructor, for normal moves

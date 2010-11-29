@@ -16,6 +16,7 @@ NOTES
 
 
 double perft(Position, int);
+void divide(Position, int);
 
 int eval(Position);
 

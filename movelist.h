@@ -25,9 +25,6 @@ class Movelist {
 		Movelist();
 
 		int currPiece; //Holds piece that moves are being generated for
-
-		int old_enPassant;
-		int old_fiftyMove;
 		
 		//Regular move. Parameters: fromSpace, toSpace
 		void add_move(int, int);

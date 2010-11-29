@@ -35,6 +35,15 @@ class Position {
 
     vector<int> whitePiecelist;           //Piecelists hold the position of each piece,
     vector<int> blackPiecelist;           //and a piece is simply deleted from the vector when captured
+	
+	vector<bool> WKhistory;
+	vector<bool> WQhistory;
+	vector<bool> BKhistory;
+	vector<bool> BQhistory;
+	vector<int> enPassantHistory;
+	vector<int> fiftyMoveHistory;
+
+	Movelist movesMade;
 
     Position();
 	Position(string);
@@ -42,9 +51,10 @@ class Position {
 	void fenParse(string);
 
     void output();
+	void outputDetails();
 	void removePiece(int, int);
+	void addPiece(int, int, int);
 	void updatePiece(int, int, int);
-    bool movePiece(Move);                 //Moves a piece. Updates board and piecelists
 	bool doMove(Move);
 	bool isAttacked(int);
 	bool inCheck();

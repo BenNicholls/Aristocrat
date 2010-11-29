@@ -25,14 +25,37 @@ double perft(Position Game, int depth) {
 	for (unsigned int i = 0; i < theMoves.list.size(); i++) {
 		Position newGame;
 		newGame = Game;
-		int check = newGame.doMove(theMoves.list[i]);
-		if (check) return 0;
-		else movecount += perft(newGame, depth - 1);
+		bool check = newGame.doMove(theMoves.list[i]);
+		if (check == false) movecount += perft(newGame, depth - 1);
 	}
 	return movecount;
 }
 
-//Takes an square in algebraic notation (ex. a4) and outputs the number on the board.
+void divide(Position Game, int depth) {
+	if (depth == 1) cout << "You are stupid";
+	else {
+		double masterCount = 0;
+		int topNodeCount = 0;
+		Movelist theMoves;
+		Game.generateMoves(theMoves);
+		for (unsigned int i = 0; i < theMoves.list.size(); i++) {
+			Position newGame;
+			newGame = Game;
+			bool check = newGame.doMove(theMoves.list[i]);
+			if (check == false) {
+				topNodeCount++;
+				double nodeCount = perft(newGame, depth - 1);
+				masterCount += nodeCount;
+				theMoves.list[i].output();
+				cout << ": " << nodeCount << endl;
+			}
+		}
+		cout << "Nodes: " << topNodeCount << endl;
+		cout << "Total Nodes: " << masterCount << endl;
+	}
+}
+
+//Takes a square in algebraic notation (ex. a4) and outputs the number on the board.
 int fromAlgebraic(string space){
 	int file; int rank;
 	switch(space[0]){

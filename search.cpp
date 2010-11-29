@@ -27,7 +27,7 @@ int search(Position Game, int depth, int alpha, int beta) {
         Game.generateMoves(nextMoves);
         for (unsigned int i = 0; i < nextMoves.list.size(); i++) {
             Position Next = Game;
-            bool check = Next.movePiece(nextMoves.list[i]);
+            bool check = Next.doMove(nextMoves.list[i]);
 			if (check) return beta;
 			else {
 				int score = -1*search(Next, depth - 1, -1*beta, -1*alpha);

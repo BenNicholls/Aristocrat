@@ -20,7 +20,7 @@ using namespace std;
 //Dummy constructor to fool stupid arrays and functions and whatever
 Move::Move() {}
 
-Move::Move(int f, int t, int p, int c, bool en, int ca, bool ju, int pr, int o_ep, int o_fif) {
+Move::Move(int f, int t, int p, int c, bool en, int ca, bool ju, int pr) {
 	fromSpace = f;
 	toSpace = t;
 	capture = c;
@@ -29,8 +29,6 @@ Move::Move(int f, int t, int p, int c, bool en, int ca, bool ju, int pr, int o_e
 	castle = ca;
 	jump = ju;
     promotion = pr;
-	old_ep = o_ep;
-	old_fifty = o_fif;
 }
 
 //Outputs the move in long notation, along with a blurb about promotions and whatnot
@@ -48,7 +46,6 @@ void Move::output() {
             cout << ", capturing a pawn!";
             if (enPassant != 0) cout << "(via En Passant! Ooh la la!)";
         }
-        cout << endl;
 	}
 }
 
