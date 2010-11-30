@@ -27,16 +27,18 @@ using namespace std;
 
 int main(){
 
-    Position Game("4k3/8/8/8/8/8/8/4K2R w K - 0 1");
+    Position Game;
 
-	//Move theMove(fromAlgebraic("d7"), fromAlgebraic("e6"), -KING, 0, false, 0, false, 0);
+	//Move theMove(fromAlgebraic("a2"), fromAlgebraic("a3"), PAWN, 0, false, 0, false, 0);
+	//theMove.output();
 	//Game.doMove(theMove);
-	//Move theMove2(fromAlgebraic("e2"), fromAlgebraic("e3"), KING, 0, false, 0, false, 0);
-	//Game.doMove(theMove2);
-	//Move theMove3(fromAlgebraic("e2"), fromAlgebraic("e3"), KING, 0, false, 0, false, 0);
-	//Game.doMove(theMove);
+	//theMove.output();
+	//Game.undoMove();
+	//theMove.output();
+
     Game.outputDetails();
-	divide(Game, 3);
+	//cout << theMove.piece;
+	divide(Game, 4);
 	cin.ignore();
     return 0;
 }

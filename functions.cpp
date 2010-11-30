@@ -23,10 +23,9 @@ double perft(Position Game, int depth) {
 	Movelist theMoves;
 	Game.generateMoves(theMoves);
 	for (unsigned int i = 0; i < theMoves.list.size(); i++) {
-		Position newGame;
-		newGame = Game;
-		bool check = newGame.doMove(theMoves.list[i]);
-		if (check == false) movecount += perft(newGame, depth - 1);
+		bool check = Game.doMove(theMoves.list[i]);
+		if (check == false) movecount += perft(Game, depth - 1);
+		Game.undoMove();
 	}
 	return movecount;
 }
@@ -39,16 +38,15 @@ void divide(Position Game, int depth) {
 		Movelist theMoves;
 		Game.generateMoves(theMoves);
 		for (unsigned int i = 0; i < theMoves.list.size(); i++) {
-			Position newGame;
-			newGame = Game;
-			bool check = newGame.doMove(theMoves.list[i]);
+			bool check = Game.doMove(theMoves.list[i]);
 			if (check == false) {
 				topNodeCount++;
-				double nodeCount = perft(newGame, depth - 1);
+				double nodeCount = perft(Game, depth - 1);
 				masterCount += nodeCount;
 				theMoves.list[i].output();
 				cout << ": " << nodeCount << endl;
 			}
+			Game.undoMove();
 		}
 		cout << "Nodes: " << topNodeCount << endl;
 		cout << "Total Nodes: " << masterCount << endl;

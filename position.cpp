@@ -216,20 +216,20 @@ void Position::removePiece(int space, int side) {
 		}
 	}
 }
-void Position::addPiece(int space, int piece, int side) {
+void Position::addPiece(int space, int side) {
 	
 	if (side == WHITE) {
 		for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
-			if (whitePiecelist[i] == space) {
-				whitePiecelist[i] = piece;
+			if (whitePiecelist[i] == NOBOARD) {
+				whitePiecelist[i] = space;
 				break;
 			}
 		}
 	}
 	else {
 		for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
-			if (blackPiecelist[i] == space) {
-				blackPiecelist[i] = piece;
+			if (blackPiecelist[i] == NOBOARD) {
+				blackPiecelist[i] = space;
 				break;
 			}
 		}
@@ -317,7 +317,7 @@ bool Position::doMove(Move theMove) {
 	}
 
 	//Update castling rights for rook moves
-	if (theMove.piece = ROOK) {
+	if (theMove.piece == ROOK) {
 		if (theMove.fromSpace == 91) castleWQ = false;
 		else if (theMove.fromSpace == 98) castleWK = false;
 	}
@@ -346,7 +346,68 @@ bool Position::doMove(Move theMove) {
 	return check;
 }
 
+void Position::undoMove() {
+	Move theMove;
+	theMove = movesMade.list.back(); movesMade.list.pop_back();
+	toMove = -toMove;
 
+	//Move piece back
+	board[theMove.fromSpace] = theMove.piece;
+	updatePiece(theMove.toSpace, theMove.fromSpace, toMove);
+
+	//If a piece was captured, put it back, you!
+	if (theMove.capture != 0) {
+		//If it was an en passant capture
+		if (theMove.enPassant) {
+			board[theMove.toSpace + 10*toMove] = -PAWN*toMove;
+			addPiece(theMove.toSpace +10*toMove, -toMove);
+		}
+		else {
+			board[theMove.toSpace] = theMove.capture;
+			addPiece(theMove.toSpace, -toMove);
+		}
+	}
+	else board[theMove.toSpace] = EMPTY;
+
+	//reupdate king positions
+	if (abs(theMove.piece) == KING){
+		if (theMove.piece == KING) whiteKing = theMove.fromSpace;
+		else blackKing = theMove.fromSpace;
+	}
+
+	if (theMove.castle != 0) {
+		if (toMove == WHITE) {
+			if (theMove.castle == 1) {
+				board[96] = EMPTY; board[98] = ROOK;
+				updatePiece(96, 98, WHITE);
+			}
+			else {
+				board[94] = EMPTY; board[91] = ROOK;
+				updatePiece(94, 91, WHITE);
+			}
+		}
+		else {
+			if (theMove.castle == 1) {
+				board[26] = EMPTY; board[28] = -ROOK;
+				updatePiece(26, 28, BLACK);
+			}
+			else {
+				board[24] = EMPTY; board[21] = -ROOK;
+				updatePiece(24, 21, BLACK);
+			}
+		}
+	}
+
+	if (toMove == BLACK) totalMoves--;
+	enPassant = enPassantHistory.back(); enPassantHistory.pop_back();
+	fiftyMove = fiftyMoveHistory.back(); fiftyMoveHistory.pop_back();
+	castleWK = WKhistory.back(); WKhistory.pop_back();
+	castleWQ = WQhistory.back(); WQhistory.pop_back();
+	castleBK = BKhistory.back(); BKhistory.pop_back();
+	castleBQ = BQhistory.back(); BQhistory.pop_back();
+
+
+}
 bool Position::inCheck() {
 	int kingSquare;
 	if (toMove == WHITE) kingSquare = whiteKing;

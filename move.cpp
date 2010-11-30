@@ -40,7 +40,7 @@ void Move::output() {
         if (capture != 0) cout << "x";
         else cout << "-";
         cout << toAlgebraic(toSpace);
-        if (promotion != 0) cout << "(" << PIECESHORT[promotion] << ")";
+        if (promotion != 0) cout << "(" << PIECESHORT[abs(promotion)] << ")";
         if (abs(capture) > 1) cout << ", capturing a " << PIECENAMES[abs(capture)] << "!";
         if (abs(capture) == 1) {
             cout << ", capturing a pawn!";

@@ -53,9 +53,10 @@ class Position {
     void output();
 	void outputDetails();
 	void removePiece(int, int);
-	void addPiece(int, int, int);
+	void addPiece(int, int);
 	void updatePiece(int, int, int);
 	bool doMove(Move);
+	void undoMove();
 	bool isAttacked(int);
 	bool inCheck();
 	void generateMoves(Movelist &);
