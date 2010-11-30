@@ -25,7 +25,7 @@ int search(Position Game, int depth, int alpha, int beta) {
     else {
         Movelist nextMoves;
         Game.generateMoves(nextMoves);
-        for (unsigned int i = 0; i < nextMoves.list.size(); i++) {
+        for (unsigned int i = 0; i < nextMoves.totalMoves; i++) {
             Position Next = Game;
             bool check = Next.doMove(nextMoves.list[i]);
 			if (check) return beta;

@@ -24,3 +24,4 @@ int search(Position, int, int, int);
 
 int fromAlgebraic(string);
 string toAlgebraic(int);
+bool perftTestSuite(int);

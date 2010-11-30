@@ -193,7 +193,7 @@ void Position::outputDetails() {
 		cout << toAlgebraic(blackPiecelist[i]) << " ";
 	}
 	cout << endl;
-	if (enPassant != 0) cout << "En Passant square is: " << enPassant << endl;
+	if (enPassant != 0) cout << "En Passant square is: " << toAlgebraic(enPassant) << endl;
 	else cout << "There is no en passant square." << endl;
 }
 
@@ -258,6 +258,14 @@ void Position::updatePiece(int fromSpace, int toSpace, int side) {
 
 bool Position::doMove(Move theMove) {
 	
+	//save history
+	WKhistory.push_back(castleWK);
+	WQhistory.push_back(castleWQ);
+	BKhistory.push_back(castleBK);
+	BQhistory.push_back(castleBQ);
+	fiftyMoveHistory.push_back(fiftyMove);
+	enPassantHistory.push_back(enPassant);
+
 	//First up: move the piece on the board, update piecelist
 	board[theMove.toSpace] = theMove.piece;
 	board[theMove.fromSpace] = EMPTY;
@@ -267,10 +275,18 @@ bool Position::doMove(Move theMove) {
 	if (theMove.capture != 0) {
 		//For enpassant captures
 		if(theMove.enPassant == true) {
-			removePiece(enPassant, -toMove);
+			removePiece(enPassant + 10*toMove, -toMove);
 			board[enPassant + 10*toMove] = EMPTY;
 		}
 		else removePiece(theMove.toSpace, -toMove);
+
+		//If a rook is captured, update castle info.
+		if(abs(theMove.capture) == ROOK) {
+			if (castleWK && theMove.toSpace == 98) castleWK = false;
+			else if (castleWQ && theMove.toSpace == 91) castleWQ = false;
+			else if (castleBK && theMove.toSpace == 28) castleBK = false;
+			else if (castleBQ && theMove.toSpace == 21) castleBQ = false;
+		}
 	}
 
 	//Speaking of en passant captures...
@@ -335,20 +351,13 @@ bool Position::doMove(Move theMove) {
 	toMove = -toMove;
 
 	//update moves made and history
-	movesMade.list.push_back(theMove);
-	WKhistory.push_back(castleWK);
-	WQhistory.push_back(castleWQ);
-	BKhistory.push_back(castleBK);
-	BQhistory.push_back(castleBQ);
-	fiftyMoveHistory.push_back(fiftyMove);
-	enPassantHistory.push_back(enPassant);
-
+	movesMade.add(theMove);
 	return check;
 }
 
 void Position::undoMove() {
 	Move theMove;
-	theMove = movesMade.list.back(); movesMade.list.pop_back();
+	theMove = movesMade.list[movesMade.totalMoves - 1];
 	toMove = -toMove;
 
 	//Move piece back
@@ -361,6 +370,7 @@ void Position::undoMove() {
 		if (theMove.enPassant) {
 			board[theMove.toSpace + 10*toMove] = -PAWN*toMove;
 			addPiece(theMove.toSpace +10*toMove, -toMove);
+			board[theMove.toSpace] = EMPTY;
 		}
 		else {
 			board[theMove.toSpace] = theMove.capture;
@@ -406,7 +416,7 @@ void Position::undoMove() {
 	castleBK = BKhistory.back(); BKhistory.pop_back();
 	castleBQ = BQhistory.back(); BQhistory.pop_back();
 
-
+	movesMade.remove_last();
 }
 bool Position::inCheck() {
 	int kingSquare;
@@ -458,159 +468,6 @@ bool Position::isAttacked(int square) {
 		}
 	}
 	return false;
-}
-
-//Generates moves for a pre-made movelist.
-void Position::generateMoves(Movelist &Moves) {
-	vector<int> piecelist;
-
-	//Load the correct piecelist
-	if (toMove == WHITE) piecelist = whitePiecelist;
-	else piecelist = blackPiecelist;
-
-	//Loop through pieces
-	for (unsigned int i = 0; i < piecelist.size(); i++) {
-		int pieceSpace = piecelist[i];
-		Moves.currPiece = board[pieceSpace];
-		switch(abs(board[pieceSpace])) {
-			case NOBOARD:
-				break;
-
-			case PAWN:
-				//Check if space ahead is empty
-				if (board[pieceSpace - 10*toMove] == EMPTY) {
-					//Check if piece is about to promote!
-					if (pieceSpace >= (56-(25*toMove)) && pieceSpace < (64-(25*toMove)))
-						Moves.add_promos(pieceSpace, pieceSpace - 10*toMove, 0); 
-					else {
-						Moves.add_move(pieceSpace, pieceSpace - 10*toMove);
-						//Test for jump moves!
-						if (board[pieceSpace - 20*toMove] == EMPTY && pieceSpace >= (56+(25*toMove)) && pieceSpace < (64+(25*toMove)))
-							Moves.add_pawnjump(pieceSpace, pieceSpace - 20*toMove);
-					}
-				}
-				//Check for capture-left
-				if (board[pieceSpace - 11*toMove]*toMove < 0 && board[pieceSpace - 11*toMove] != NOBOARD) {
-					//Check for capture promotion
-					if (pieceSpace >= (56-(25*toMove)) && pieceSpace < (64-(25*toMove)))
-						Moves.add_promos(pieceSpace, pieceSpace - 11*toMove, board[pieceSpace - 11*toMove]);
-					else Moves.add_capture(pieceSpace, pieceSpace - 11*toMove, board[pieceSpace - 11*toMove]);
-				}
-				//Check for enpassant left
-				else if (pieceSpace - 11*toMove == enPassant) Moves.add_enpassant(pieceSpace, enPassant, -toMove);
-
-				//Check for capture-right
-				if (board[pieceSpace - 9*toMove]*toMove < 0 && board[pieceSpace - 9*toMove] != NOBOARD) {
-					//Check for capture promotion
-					if (pieceSpace >= (56-(25*toMove)) && pieceSpace < (64-(25*toMove)))
-						Moves.add_promos(pieceSpace, pieceSpace - 9*toMove, board[pieceSpace - 9*toMove]);
-					else Moves.add_capture(pieceSpace, pieceSpace - 9*toMove, board[pieceSpace - 9*toMove]);
-				}
-				else if (pieceSpace - 9*toMove == enPassant) Moves.add_enpassant(pieceSpace, enPassant, -toMove);
-				break;
-
-			case KNIGHT:			
-				for (unsigned int j=0; j < 8; j++) {
-					int moveSquare = pieceSpace + KNIGHTMOVES[j];
-					//Regular move
-					if(board[moveSquare] == EMPTY) Moves.add_move(pieceSpace, moveSquare);
-					//Capture
-					else if (board[moveSquare]*toMove < 0 && board[moveSquare] != NOBOARD) 
-						Moves.add_capture(pieceSpace, moveSquare, board[moveSquare]);
-				}
-				break;
-
-			case BISHOP:
-				//Loop over possible directions
-				for (unsigned int j=0; j < 4; j++) {
-					int raySpace = pieceSpace;
-					bool ray = true;
-					//extend ray
-					while (ray) {
-						raySpace += SLIDEMOVES[j];
-						if (board[raySpace] == 0) Moves.add_move(pieceSpace, raySpace);
-						else if (board[raySpace]*toMove < 0 && board[raySpace] != NOBOARD) {
-							Moves.add_capture(pieceSpace, raySpace, board[raySpace]);
-							ray = false;
-						}
-						else ray = false;
-					}
-				}
-				break;
-
-			case ROOK:
-				//Loop over possible directions
-				for (unsigned int j=4; j < 8; j++) {
-					int raySpace = pieceSpace;
-					bool ray = true;
-					//extend ray
-					while (ray) {
-						raySpace += SLIDEMOVES[j];
-						if (board[raySpace] == 0) Moves.add_move(pieceSpace, raySpace);
-						else if (board[raySpace]*toMove < 0 && board[raySpace] != NOBOARD) {
-							Moves.add_capture(pieceSpace, raySpace, board[raySpace]);
-							ray = false;
-						}
-						else ray = false;
-					}
-				}
-				break;
-
-			case QUEEN:
-				//Loop over possible directions
-				for (unsigned int j=0; j < 8; j++) {
-					int raySpace = pieceSpace;
-					bool ray = true;
-					//extend ray
-					while (ray) {
-						raySpace += SLIDEMOVES[j];
-						if (board[raySpace] == 0) Moves.add_move(pieceSpace, raySpace);
-						else if (board[raySpace]*toMove < 0 && board[raySpace] != NOBOARD) {
-							Moves.add_capture(pieceSpace, raySpace, board[raySpace]);
-							ray = false;
-						}
-						else ray = false;
-					}
-				}
-				break;
-
-			case KING:
-				for (unsigned int j=0; j < 8; j++) {
-					int moveSpace = pieceSpace + SLIDEMOVES[j];
-					if (board[moveSpace] == EMPTY) {
-						Moves.add_move(pieceSpace, moveSpace);
-						//Castle checking time
-						if (toMove == WHITE) {
-							if (j == 5 && castleWK == true) {
-								if (board[97] == EMPTY) {
-									if (!isAttacked(97) && !isAttacked(96)) Moves.add_castle(1, WHITE);
-								}
-							}
-							else if (j == 7 && castleWQ == true) {
-								if (board[93] == EMPTY && board[92] == EMPTY) {
-									if (!isAttacked(93) && !isAttacked(94)) Moves.add_castle(2, WHITE);
-								}
-							}
-						}
-						else {
-							if (j == 5 && castleBK == true) {
-								if (board[27] == EMPTY) {
-									if (!isAttacked(27) && !isAttacked(26)) Moves.add_castle(1, BLACK);
-								}
-							}
-							else if (j == 7 && castleBQ == true) {
-								if (board[23] == EMPTY && board[22] == EMPTY) {
-									if (!isAttacked(23) && !isAttacked(24)) Moves.add_castle(2, BLACK);
-								}
-							}
-						}
-					}
-					else if (board[moveSpace]*toMove < 0 && board[moveSpace] != NOBOARD)
-						Moves.add_capture(pieceSpace, moveSpace, board[moveSpace]);
-				}
-				break;
-		}
-	}
 }
 
 

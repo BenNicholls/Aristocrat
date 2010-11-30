@@ -10,9 +10,8 @@
 class Move {
 
 	public:
-		int fromSpace;                        //Space where it is coming from
-		int toSpace;                          //Space where it is going
-		int score;                            //How good is move? You decide.
+		unsigned int fromSpace;                        //Space where it is coming from
+		unsigned int toSpace;                          //Space where it is going
 		int piece;                            //Records which piece is moving
 		int capture;                          //Records which piece was hit
 		bool enPassant;                        //1 if enpassant capture, 0 otherwise
@@ -21,12 +20,7 @@ class Move {
 		bool jump;                             //1 if pawn jumped 2 spaces, 0 if not
 
 		Move();
-
-		Move(int, int, int, int);             //Regular constructor, for normal moves
-		                                      //Crazy constructor for crazies
 		Move(int, int, int, int, bool, int, bool, int);
 
-		Move(int, int, int, int, bool, int, bool, int, int, int);
-
-		void output();                             //Outputs a description of the movess
+		void output();                             //Outputs a description of the moves
 };

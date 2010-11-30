@@ -18,7 +18,16 @@ NOTES
 using namespace std;
 
 //Dummy constructor to fool stupid arrays and functions and whatever
-Move::Move() {}
+Move::Move() {
+	fromSpace = 0;
+	toSpace = 0;
+	capture = 0;
+	piece = 0;
+	enPassant = false;
+	castle = 0;
+	jump = false;
+	promotion = 0;
+}
 
 Move::Move(int f, int t, int p, int c, bool en, int ca, bool ju, int pr) {
 	fromSpace = f;
@@ -33,8 +42,8 @@ Move::Move(int f, int t, int p, int c, bool en, int ca, bool ju, int pr) {
 
 //Outputs the move in long notation, along with a blurb about promotions and whatnot
 void Move::output() {
-    if (castle == 1) cout << "0-0" << endl;
-    else if (castle == 2) cout << "0-0-0" << endl;
+    if (castle == 1) cout << "0-0";
+    else if (castle == 2) cout << "0-0-0";
     else {   
 		cout << PIECESHORT[abs(piece)] << toAlgebraic(fromSpace);
         if (capture != 0) cout << "x";

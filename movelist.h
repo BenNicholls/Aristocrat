@@ -11,7 +11,6 @@ NOTES
 
 #pragma once
 
-#include <vector>
 #include "move.h"
 
 using namespace std;
@@ -20,7 +19,8 @@ class Movelist {
 
 	public:
 
-		vector<Move> list; //What for to hold the moves.
+		Move list[256]; //What for to hold the moves.	
+		unsigned int totalMoves;
 
 		Movelist();
 
@@ -34,10 +34,12 @@ class Movelist {
 		void add_promos(int, int, int);
 		//Castle moves. Parameters: castle number (1 king, 2 queen), side to move
 		void add_castle(int, int);
-		//Enpassant moves. Parameters: fromSpace, toSpace
+		//Enpassant moves. Parameters: fromSpace, toSpace, side being captured
 		void add_enpassant(int, int, int);
 		//Pawn jumps. Parameters: fromSpace, toSpace
 		void add_pawnjump(int, int);
 
+		void add(Move);
+		void remove_last();
 		void output();
 };
