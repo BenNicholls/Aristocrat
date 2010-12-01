@@ -2,7 +2,6 @@
                                     Aristocrat
 								  Position Class
                                    position.cpp
-                            Last Updated Nov 28, 2010
 
 NOTES
   - Castling, promotion, and en passant have been implemented fully, but only
@@ -42,6 +41,7 @@ void Position::customSetup() {
     castleBQ = true;
     fiftyMove = 0;
 	totalMoves = 0;
+	halfMoves = 0;
 	
 	//Clears the board, sets up NOBOARD zones.
 	for (int i = 0; i < 120; i++) {
@@ -154,19 +154,20 @@ void Position::fenParse(string fen){
 
 	fiftyMove = atoi(FenPieces[11].c_str());
 	totalMoves = atoi(FenPieces[12].c_str());
+	halfMoves = 0;
 }
 
 //Outputs a fancy schmancy board, all ASCII and everything.
 void Position::output() {
-    cout << "  _ _ _ _ _ _ _ _ " << endl << "8|";
+    cout << "  --- --- --- --- --- --- --- --- " << endl << "8|";
     for (int i=21; i < 99; i++) {
         if (board[i] != NOBOARD) {
-            if (board[i] < 0) cout << BLACKPIECEOUTPUT[abs(board[i])] << "|";
-            else cout << WHITEPIECEOUTPUT[board[i]] << "|";
-            if (i%10 == 8 && i != 98) cout << endl << "  - - - - - - - -" << endl << (7 - (i - 20)/10) << "|";
+            if (board[i] < 0) cout << " " << BLACKPIECEOUTPUT[abs(board[i])] << " |";
+            else cout << " " << WHITEPIECEOUTPUT[board[i]] << " |";
+            if (i%10 == 8 && i != 98) cout << endl << "  ---+---+---+---+---+---+---+---" << endl << (7 - (i - 20)/10) << "|";
         }
     }
-    cout << endl << "  - - - - - - - -" << endl << "  a b c d e f g h" << endl;
+    cout << endl << "  --- --- --- --- --- --- --- ---" << endl << "   a   b   c   d   e   f   g   h" << endl;
     if (toMove == WHITE) cout << "White to move." << endl;
     else cout << "Black to move." << endl;
 }
@@ -256,15 +257,10 @@ void Position::updatePiece(int fromSpace, int toSpace, int side) {
 	}
 }
 
-bool Position::doMove(Move theMove) {
+bool Position::doMove(Move &theMove) {
 	
 	//save history
-	WKhistory.push_back(castleWK);
-	WQhistory.push_back(castleWQ);
-	BKhistory.push_back(castleBK);
-	BQhistory.push_back(castleBQ);
-	fiftyMoveHistory.push_back(fiftyMove);
-	enPassantHistory.push_back(enPassant);
+	updateHistory();
 
 	//First up: move the piece on the board, update piecelist
 	board[theMove.toSpace] = theMove.piece;
@@ -347,6 +343,7 @@ bool Position::doMove(Move theMove) {
 	else fiftyMove++;
 
 	if (toMove == BLACK) totalMoves++;
+	halfMoves++;
 	bool check = inCheck();
 	toMove = -toMove;
 
@@ -409,15 +406,27 @@ void Position::undoMove() {
 	}
 
 	if (toMove == BLACK) totalMoves--;
-	enPassant = enPassantHistory.back(); enPassantHistory.pop_back();
-	fiftyMove = fiftyMoveHistory.back(); fiftyMoveHistory.pop_back();
-	castleWK = WKhistory.back(); WKhistory.pop_back();
-	castleWQ = WQhistory.back(); WQhistory.pop_back();
-	castleBK = BKhistory.back(); BKhistory.pop_back();
-	castleBQ = BQhistory.back(); BQhistory.pop_back();
+	halfMoves--;
+	castleWK = WKhistory[halfMoves];
+	castleBK = BKhistory[halfMoves];
+	castleWQ = WQhistory[halfMoves];
+	castleBQ = BQhistory[halfMoves];
+	enPassant = enPassantHistory[halfMoves];
+	fiftyMove = fiftyMoveHistory[halfMoves];
 
 	movesMade.remove_last();
+
 }
+
+void Position::updateHistory() {
+	WKhistory[halfMoves] = castleWK;
+	BKhistory[halfMoves] = castleBK;
+	WQhistory[halfMoves] = castleWQ;
+	BQhistory[halfMoves] = castleBQ;
+	enPassantHistory[halfMoves] = enPassant;
+	fiftyMoveHistory[halfMoves] = fiftyMove;
+}
+
 bool Position::inCheck() {
 	int kingSquare;
 	if (toMove == WHITE) kingSquare = whiteKing;

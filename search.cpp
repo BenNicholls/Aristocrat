@@ -2,13 +2,11 @@
                                     Aristocrat
                                  Search Function
 								    search.cpp
-							Last Updated March 24, 2009
 
 NOTES:
     - WHY DONT YOU WORK, GODDAMN YOU.
  **********************************************************************************/
 
-#include <vector>
 #include <algorithm>
 #include <iostream>
 #include "position.h"

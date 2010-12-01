@@ -2,7 +2,6 @@
                                     Aristocrat
                                  Functions Header
                                     functions.h
-                            Last Updated March 14, 2009
 
 NOTES
   - Well. Isn't this fantastic. Function declarations: this is where the goods is.
@@ -15,8 +14,8 @@ NOTES
 #include <string>
 
 
-double perft(Position, int);
-void divide(Position, int);
+double perft(Position &, int);
+void divide(Position &, int);
 
 int eval(Position);
 

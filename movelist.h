@@ -2,7 +2,6 @@
                                     Aristocrat
 								  Movelist Header
                                     movelist.h
-                            Last Updated Nov 28, 2010
 
 NOTES
 	- Movelist object holds moves for a position, and contains helper functions for

@@ -2,7 +2,6 @@
                                     Aristocrat
                                   Functions Code
                                    functions.cpp
-                            Last Updated March 14, 2009
 NOTES
 	- Nothing to see here folks.
 **********************************************************************************/
@@ -18,7 +17,7 @@ NOTES
 using namespace std;
 
 //Perft function. Depth parameter should be 1 for current position, more for extra depth.
-double perft(Position Game, int depth) {
+double perft(Position &Game, int depth) {
 	if (depth == 0) return 1;
 	double movecount = 0;
 	Movelist theMoves;
@@ -34,7 +33,7 @@ double perft(Position Game, int depth) {
 	return movecount;
 }
 
-void divide(Position Game, int depth) {
+void divide(Position &Game, int depth) {
 	double masterCount = 0;
 	int topNodeCount = 0;
 	Movelist theMoves;
@@ -50,14 +49,15 @@ void divide(Position Game, int depth) {
 		}
 		Game.undoMove();
 	}
-	cout.setf(ios::fixed,ios::floatfield); 
+	//cout.setf(ios::fixed, ios::floatfield);
+	cout.precision(10);
 	cout << "Nodes: " << topNodeCount << endl;
 	cout << "Total Nodes: " << masterCount << endl;
 }
 
 //Takes a square in algebraic notation (ex. a4) and outputs the number on the board.
 int fromAlgebraic(string space){
-	int file; int rank;
+	int file = 9; int rank = 9;
 	switch(space[0]){
 		case 'a': file = 0; break;
 		case 'b': file = 1; break;
@@ -78,7 +78,8 @@ int fromAlgebraic(string space){
 		case '7': rank = 1; break;
 		case '8': rank = 0; break;
 	}
-	return 21 + 10*rank + file;
+	if (file == 9 || rank == 9) return 0;
+	else return 21 + 10*rank + file;
 }
 
 //Takes a board space, returns a string with the algebraic form
@@ -98,7 +99,10 @@ bool perftTestSuite(int lineNum) {
 			}
 			myfile.close();
 		}
-		else cout << "FILE ERROR";
+		else { 
+			cout << "FILE ERROR";
+			return false;
+		}
 
 		//split into chunks
 		int count = 0;
@@ -133,7 +137,7 @@ bool perftTestSuite(int lineNum) {
 
 		for (unsigned int i = 0; i < 6; i++) {
 			cout << "Perft " << i+1 << ": ";
-			cout.setf(ios::fixed,ios::floatfield);
+			cout.precision(10);
 			cout << " (expected value: " << expectations[i] << ")... ";
 			if (i == 5 && lineNum == 1) break;
 			double movecount = perft(testGame, i+1);

@@ -2,7 +2,6 @@
                                     Aristocrat
                                Evaluation Function
                                      eval.cpp
-                            Last Updated March 14, 2009
 
 NOTES:
 	- Evaluation function loops through white pieces and black pieces seperately,

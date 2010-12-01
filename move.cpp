@@ -2,7 +2,6 @@
                                     Aristocrat
 							        Move Class
 							         move.cpp
-                            Last Updated March 30, 2009
 
 NOTES
 	- Move output now correctly supports blurbs about castling, promotion, captures,

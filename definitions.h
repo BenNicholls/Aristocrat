@@ -2,7 +2,6 @@
                                     Aristocrat
                                Constant Definitions
                                   definitions.h
-                           Last Updated March 30, 2009
 
 NOTES
     - Do I like NOBOARD being 99? I wish I could make it imaginary or something.

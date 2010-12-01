@@ -2,7 +2,6 @@
                                     Aristocrat
 							     Move Class Header
 							          move.h
-                            Last Updated March 10, 2009
 **********************************************************************************/
 
 #pragma once
