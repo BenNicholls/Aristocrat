@@ -28,7 +28,7 @@ Move::Move() {
 	promotion = 0;
 }
 
-Move::Move(int f, int t, int p, int c, bool en, int ca, bool ju, int pr) {
+Move::Move(int &f, int &t, int &p, int c, bool en, int ca, bool ju, int pr) {
 	fromSpace = f;
 	toSpace = t;
 	capture = c;
@@ -37,6 +37,17 @@ Move::Move(int f, int t, int p, int c, bool en, int ca, bool ju, int pr) {
 	castle = ca;
 	jump = ju;
     promotion = pr;
+}
+
+void Move::outputShort() {
+	if (castle == 1) cout << "0-0";
+    else if (castle == 2) cout << "0-0-0";
+    else {   
+		cout << PIECESHORT[abs(piece)] << toAlgebraic(fromSpace);
+        if (capture != 0) cout << "x";
+        cout << toAlgebraic(toSpace);
+        if (promotion != 0) cout << "(" << PIECESHORT[abs(promotion)] << ")";
+	}
 }
 
 //Outputs the move in long notation, along with a blurb about promotions and whatnot
@@ -56,4 +67,6 @@ void Move::output() {
         }
 	}
 }
+
+
 

@@ -5,6 +5,7 @@
 **************************************************************************************************/
 
 #include "position.h"
+#include "move.h"
 
 using namespace std;
 
@@ -18,3 +19,9 @@ void ifaceNew(Position &);
 void ifacePerftTest(string, Position);
 void ifaceMove(string, Position &);
 void ifaceUndo(string, Position &);
+void ifaceAbout();
+void ifaceSimpleSearch(string, Position);
+Move ifaceSearch(string, Position, int);
+void ifacePlay(string, string &);
+void ifaceSetDepth(string, int &);
+void ifaceGo(Position &, int, string &);

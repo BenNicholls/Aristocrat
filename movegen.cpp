@@ -21,9 +21,10 @@ void Position::generateMoves(Movelist &Moves) {
 				if (board[pieceSpace - 10*toMove] == EMPTY) {
 					//Check if piece is about to promote!
 					if (pieceSpace >= (56-(25*toMove)) && pieceSpace < (64-(25*toMove)))
-						Moves.add_promos(pieceSpace, pieceSpace - 10*toMove, 0); 
+						Moves.add_promos(pieceSpace, pieceSpace - 10*toMove, EMPTY); 
 					else {
-						Moves.add_move(pieceSpace, pieceSpace - 10*toMove);
+						int to = pieceSpace - 10*toMove;
+						Moves.add_move(pieceSpace, to);
 						//Test for jump moves!
 						if (board[pieceSpace - 20*toMove] == EMPTY && pieceSpace >= (56+(25*toMove)) && pieceSpace < (64+(25*toMove)))
 							Moves.add_pawnjump(pieceSpace, pieceSpace - 20*toMove);
@@ -34,7 +35,10 @@ void Position::generateMoves(Movelist &Moves) {
 					//Check for capture promotion
 					if (pieceSpace >= (56-(25*toMove)) && pieceSpace < (64-(25*toMove)))
 						Moves.add_promos(pieceSpace, pieceSpace - 11*toMove, board[pieceSpace - 11*toMove]);
-					else Moves.add_capture(pieceSpace, pieceSpace - 11*toMove, board[pieceSpace - 11*toMove]);
+					else {
+						int to = pieceSpace - 11*toMove;
+						Moves.add_capture(pieceSpace, to, board[pieceSpace - 11*toMove]);
+					}
 				}
 				//Check for enpassant left
 				else if (pieceSpace - 11*toMove == enPassant) Moves.add_enpassant(pieceSpace, enPassant, -toMove);
@@ -44,7 +48,10 @@ void Position::generateMoves(Movelist &Moves) {
 					//Check for capture promotion
 					if (pieceSpace >= (56-(25*toMove)) && pieceSpace < (64-(25*toMove)))
 						Moves.add_promos(pieceSpace, pieceSpace - 9*toMove, board[pieceSpace - 9*toMove]);
-					else Moves.add_capture(pieceSpace, pieceSpace - 9*toMove, board[pieceSpace - 9*toMove]);
+					else {
+						int to =  pieceSpace - 9*toMove;
+						Moves.add_capture(pieceSpace, to, board[pieceSpace - 9*toMove]);
+					}
 				}
 				else if (pieceSpace - 9*toMove == enPassant) Moves.add_enpassant(pieceSpace, enPassant, -toMove);
 				break;
@@ -124,24 +131,24 @@ void Position::generateMoves(Movelist &Moves) {
 							if (toMove == WHITE) {
 								if (j == 5 && castleWK == true) {
 									if (board[97] == EMPTY) {
-										if (!isAttacked(97) && !isAttacked(96)) Moves.add_castle(1, WHITE);
+										if (!isAttacked(97) && !isAttacked(96)) Moves.add_castle(1, 1);
 									}
 								}
 								else if (j == 7 && castleWQ == true) {
 									if (board[93] == EMPTY && board[92] == EMPTY) {
-										if (!isAttacked(93) && !isAttacked(94)) Moves.add_castle(2, WHITE);
+										if (!isAttacked(93) && !isAttacked(94)) Moves.add_castle(2, 1);
 									}
 								}
 							}
 							else {
 								if (j == 5 && castleBK == true) {
 									if (board[27] == EMPTY) {
-										if (!isAttacked(27) && !isAttacked(26)) Moves.add_castle(1, BLACK);
+										if (!isAttacked(27) && !isAttacked(26)) Moves.add_castle(1, -1);
 									}
 								}
 								else if (j == 7 && castleBQ == true) {
 									if (board[23] == EMPTY && board[22] == EMPTY) {
-										if (!isAttacked(23) && !isAttacked(24)) Moves.add_castle(2, BLACK);
+										if (!isAttacked(23) && !isAttacked(24)) Moves.add_castle(2, -1);
 									}
 								}
 							}

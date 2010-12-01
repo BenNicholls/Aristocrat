@@ -28,7 +28,7 @@ using namespace std;
 
 int main(){
 
-    Position Game;
+    Position Game("3k1q2/p3bP2/1p1pQ3/8/5r2/8/PP3PPP/2R1R1K1 b - - 0 32");
 	interfaceON(Game);
 
     return 0;

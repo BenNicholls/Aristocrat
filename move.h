@@ -19,7 +19,8 @@ class Move {
 		bool jump;                             //1 if pawn jumped 2 spaces, 0 if not
 
 		Move();
-		Move(int, int, int, int, bool, int, bool, int);
+		Move(int &, int &, int &, int, bool, int, bool, int);
 
 		void output();                             //Outputs a description of the moves
+		void outputShort();
 };

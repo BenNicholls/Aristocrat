@@ -36,12 +36,12 @@ class Position {
     vector<int> whitePiecelist;           //Piecelists hold the position of each piece,
     vector<int> blackPiecelist;           //and a piece is simply deleted from the vector when captured
 	
-	bool WKhistory[1024];
-	bool WQhistory[1024];
+	bool WKhistory[5096];
+	bool WQhistory[5096];
 	bool BKhistory[1024];
 	bool BQhistory[1024];
-	unsigned int enPassantHistory[1024];
-	unsigned int fiftyMoveHistory[1024];
+	unsigned int enPassantHistory[5096];
+	unsigned int fiftyMoveHistory[5096];
 
 	Movelist movesMade;
 

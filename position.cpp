@@ -159,15 +159,15 @@ void Position::fenParse(string fen){
 
 //Outputs a fancy schmancy board, all ASCII and everything.
 void Position::output() {
-    cout << "  --- --- --- --- --- --- --- --- " << endl << "8|";
+    cout << "  ------------------------------- " << endl << "8|";
     for (int i=21; i < 99; i++) {
         if (board[i] != NOBOARD) {
             if (board[i] < 0) cout << " " << BLACKPIECEOUTPUT[abs(board[i])] << " |";
             else cout << " " << WHITEPIECEOUTPUT[board[i]] << " |";
-            if (i%10 == 8 && i != 98) cout << endl << "  ---+---+---+---+---+---+---+---" << endl << (7 - (i - 20)/10) << "|";
+            if (i%10 == 8 && i != 98) cout << endl << " |---+---+---+---+---+---+---+---|" << endl << (7 - (i - 20)/10) << "|";
         }
     }
-    cout << endl << "  --- --- --- --- --- --- --- ---" << endl << "   a   b   c   d   e   f   g   h" << endl;
+    cout << endl << "  -------------------------------" << endl << "   a   b   c   d   e   f   g   h" << endl;
     if (toMove == WHITE) cout << "White to move." << endl;
     else cout << "Black to move." << endl;
 }
@@ -186,12 +186,12 @@ void Position::outputDetails() {
 	cout << "Fiftymove counter: " << fiftyMove << ". Total moves: " << totalMoves << endl;
 	cout << "White pieces are located on: ";
 	for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
-		cout << toAlgebraic(whitePiecelist[i]) << " ";
+		if (whitePiecelist[i] != NOBOARD) cout << toAlgebraic(whitePiecelist[i]) << " ";
 	}
 	cout << endl;
 	cout << "Black pieces are located on: ";
 	for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
-		cout << toAlgebraic(blackPiecelist[i]) << " ";
+		if (blackPiecelist[i] != NOBOARD) cout << toAlgebraic(blackPiecelist[i]) << " ";
 	}
 	cout << endl;
 	if (enPassant != 0) cout << "En Passant square is: " << toAlgebraic(enPassant) << endl;

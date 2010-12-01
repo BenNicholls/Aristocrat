@@ -9,6 +9,7 @@ NOTES
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
 #include "position.h"
 #include "functions.h"
 #include "definitions.h"
@@ -25,7 +26,6 @@ double perft(Position &Game, int depth) {
 	for (unsigned int i = 0; i < theMoves.totalMoves; i++) {
 		bool check = Game.doMove(theMoves.list[i]);
 		if (check == false) { 
-			//theMoves.list[i].output(); cout << " ";
 			movecount += perft(Game, depth - 1);
 		}
 		Game.undoMove();
@@ -49,7 +49,6 @@ void divide(Position &Game, int depth) {
 		}
 		Game.undoMove();
 	}
-	//cout.setf(ios::fixed, ios::floatfield);
 	cout.precision(10);
 	cout << "Nodes: " << topNodeCount << endl;
 	cout << "Total Nodes: " << masterCount << endl;
@@ -153,4 +152,8 @@ bool perftTestSuite(int lineNum) {
 		return pass;
 	}
 	else return false;
+}
+
+int genRandInt(int low, int high){
+    return (rand() % (high - low + 1)) + low;
 }
