@@ -18,7 +18,7 @@ class Movelist {
 
 	public:
 
-		Move list[256]; //What for to hold the moves.	
+		Move list[512]; //What for to hold the moves.	
 		unsigned int totalMoves;
 
 		Movelist();

@@ -3,7 +3,7 @@
 #include "move.h"
 #include "definitions.h"
 
-Movelist::Movelist() {totalMoves = 0; };
+Movelist::Movelist() {totalMoves = 0; }
 
 void Movelist::add(Move theMove) {
 	list[totalMoves] = theMove;

@@ -274,12 +274,12 @@ Move ChessInterface::ifaceSearch(string parameter) {
 	if (depth > 0) {
 		int score = Aristocrat.rootSearch(depth, -INFINITY, INFINITY, Variation);
 		if (abs(score) == CHECKMATE) {
-			cout << "It's checkmate, boy!" << endl;
 			if (Variation.totalMoves > 0) {
-				cout << "Depth " << depth << ": " <<(float)score/100 << " | ";
+				cout << "Depth " << depth << ": Mate | ";
 				Variation.output();
 				cout << endl;
 			}
+			else cout << "It's checkmate, boy!" << endl;
 		}
 		else if (abs(score) == STALEMATE) cout << "Stalemate! Nice try!";
 		else if (abs(score) == FIFTYMOVEDRAW) cout << "Draw! Fifty move rule, baby!";

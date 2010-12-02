@@ -43,6 +43,7 @@ void Position::customSetup() {
 	totalMoves = 0;
 	halfMoves = 0;
 	
+	
 	//Clears the board, sets up NOBOARD zones.
 	for (int i = 0; i < 120; i++) {
 		if (i/10 < 2 || i/10 > 9 || i%10 == 0 || i%10 == 9) board[i] = NOBOARD;
@@ -72,6 +73,8 @@ void Position::customSetup() {
             loadCount++;
         }
     }
+
+	generateHash();
 }
 
 //Parses the fen string, sets up the position. WARNING: no checks are currently
@@ -155,6 +158,7 @@ void Position::fenParse(string fen){
 	fiftyMove = atoi(FenPieces[11].c_str());
 	totalMoves = atoi(FenPieces[12].c_str());
 	halfMoves = 0;
+	generateHash();
 }
 
 //Outputs a fancy schmancy board, all ASCII and everything.
@@ -196,6 +200,7 @@ void Position::outputDetails() {
 	cout << endl;
 	if (enPassant != 0) cout << "En Passant square is: " << toAlgebraic(enPassant) << endl;
 	else cout << "There is no en passant square." << endl;
+	cout << "Hashkey: " << hash << endl;
 }
 
 void Position::removePiece(int space, int side) {
@@ -349,6 +354,7 @@ bool Position::doMove(Move &theMove) {
 
 	//update moves made and history
 	movesMade.add(theMove);
+	generateHash();
 	return check;
 }
 
@@ -415,6 +421,7 @@ void Position::undoMove() {
 	fiftyMove = fiftyMoveHistory[halfMoves];
 
 	movesMade.remove_last();
+	generateHash();
 
 }
 
@@ -481,4 +488,70 @@ bool Position::isAttacked(int square) {
 
 
 	
+void Position::generateHash() {
+	hash = 0;
+
+	for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
+		int spot = whitePiecelist[i];
+		int spot64 = 8*(spot/10 - 2) + spot%10 - 1;
+		switch (board[spot]) {
+			case NOBOARD:
+				break;
+			case PAWN:
+				hash = hash ^ Hashes.whitePawnKeys[spot64];
+				break;
+			case KNIGHT:
+				hash = hash ^ Hashes.whitePawnKeys[spot64];
+				break;
+			case BISHOP:
+				hash = hash ^ Hashes.whitePawnKeys[spot64];
+				break;
+			case ROOK:
+				hash = hash ^ Hashes.whitePawnKeys[spot64];
+				break;
+			case QUEEN:
+				hash = hash ^ Hashes.whitePawnKeys[spot64];
+				break;
+			case KING:
+				hash = hash ^ Hashes.whitePawnKeys[spot64];
+				break;
+		}
+	}
+
+	for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
+		int spot = blackPiecelist[i];
+		int spot64 = 8*(spot/10 - 2) + spot%10 - 1;
+		switch (abs(board[spot])) {
+			case NOBOARD:
+				break;
+			case PAWN:
+				hash = hash ^ Hashes.blackPawnKeys[spot64];
+				break;
+			case KNIGHT:
+				hash = hash ^ Hashes.blackPawnKeys[spot64];
+				break;
+			case BISHOP:
+				hash = hash ^ Hashes.blackPawnKeys[spot64];
+				break;
+			case ROOK:
+				hash = hash ^ Hashes.blackPawnKeys[spot64];
+				break;
+			case QUEEN:
+				hash = hash ^ Hashes.blackPawnKeys[spot64];
+				break;
+			case KING:
+				hash = hash ^ Hashes.blackPawnKeys[spot64];
+				break;
+		}
+	}
 	
+	if (castleWK) hash = hash ^ Hashes.castleKeys[0];
+	if (castleWQ) hash = hash ^ Hashes.castleKeys[1];
+	if (castleBK) hash = hash ^ Hashes.castleKeys[2];
+	if (castleBQ) hash = hash ^ Hashes.castleKeys[3];
+
+	if (enPassant != 0) hash = hash ^ Hashes.enpassantKeys[enPassant%10-1];
+
+	if (toMove == BLACK) hash = hash ^ Hashes.blackKey;
+}
+

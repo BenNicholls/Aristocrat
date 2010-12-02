@@ -13,6 +13,7 @@ NOTES
 #include <string>
 #include <vector>
 #include "movelist.h"
+#include "hashtable.h"
 
 using namespace std;
 
@@ -20,6 +21,7 @@ class Position {
 
   public:
     int board[120];                      //12x10 board, 8x8 padded for knight moves
+	
 
     unsigned int enPassant;                      //Holds valid enpassant square, or 0
     bool castleWK;
@@ -32,7 +34,7 @@ class Position {
     unsigned int blackKing;
 	unsigned int totalMoves;
 	unsigned int halfMoves;
-
+	unsigned long long hash;
     vector<int> whitePiecelist;           //Piecelists hold the position of each piece,
     vector<int> blackPiecelist;           //and a piece is simply deleted from the vector when captured
 	
@@ -42,14 +44,15 @@ class Position {
 	bool BQhistory[5096];
 	unsigned int enPassantHistory[5096];
 	unsigned int fiftyMoveHistory[5096];
-
+	Hashtable Hashes;
 	Movelist movesMade;
 
     Position();
 	Position(string);
 	void customSetup();
 	void fenParse(string);
-
+	
+	void generateHash();
     void output();
 	void outputDetails();
 	void removePiece(int, int);
