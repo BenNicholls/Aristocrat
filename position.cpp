@@ -22,59 +22,13 @@ NOTES
 //Position setup function. Entering "custom" sets up the position are diagrammed in Position::customSetup()
 //otherwise, it sends the input parameter to be parsed as a fen string. 
 Position::Position(string setup){
-	if (setup == "custom") customSetup();
-	else fenParse(setup);
+	fenParse(setup);
 }
 
 //No string included? Initial position set up then.
 Position::Position(){
 	string fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 	fenParse(fen);
-}
-
-void Position::customSetup() {
-    toMove = WHITE;
-    enPassant = 0;
-    castleWK = true;
-    castleWQ = true;
-    castleBK = true;
-    castleBQ = true;
-    fiftyMove = 0;
-	totalMoves = 0;
-	halfMoves = 0;
-	
-	
-	//Clears the board, sets up NOBOARD zones.
-	for (int i = 0; i < 120; i++) {
-		if (i/10 < 2 || i/10 > 9 || i%10 == 0 || i%10 == 9) board[i] = NOBOARD;
-		else board[i] = EMPTY;
-	}
-	
-//	Nice visual way to set up the board. Not too shabby!
-    int boardsetup[64] = { -ROOK, -KNIGHT, -BISHOP, -QUEEN, -KING, -BISHOP, -KNIGHT, -ROOK, //8
-                           -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN, -PAWN,          //7
-                           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,          //6
-                           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,          //5
-                           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,          //4
-                           EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,         //3
-                           PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, PAWN, 			    //2
-                           ROOK, KNIGHT, BISHOP, QUEEN, KING, BISHOP, KNIGHT, ROOK };       //1
-// 							a 		b 		c 		d 	 e 		f 		g 		h
-
-	//Throws the above position onto the board
-    int loadCount = 0;
-    for (int i = 20; i < 99; i++) {
-		if (board[i] != NOBOARD) {
-            board[i] = boardsetup[loadCount];
-			if (boardsetup[loadCount] > 0) whitePiecelist.push_back(i); 
-			else if (boardsetup[loadCount] < 0) blackPiecelist.push_back(i);
-            if (boardsetup[loadCount] == KING) whiteKing = i;
-            else if (boardsetup[loadCount] == -KING) blackKing = i;
-            loadCount++;
-        }
-    }
-
-	generateHash();
 }
 
 //Parses the fen string, sets up the position. WARNING: no checks are currently
@@ -354,7 +308,7 @@ bool Position::doMove(Move &theMove) {
 
 	//update moves made and history
 	movesMade.add(theMove);
-	generateHash();
+	//generateHash();
 	return check;
 }
 
@@ -421,7 +375,7 @@ void Position::undoMove() {
 	fiftyMove = fiftyMoveHistory[halfMoves];
 
 	movesMade.remove_last();
-	generateHash();
+	//generateHash();
 
 }
 
@@ -486,8 +440,6 @@ bool Position::isAttacked(int square) {
 	return false;
 }
 
-
-	
 void Position::generateHash() {
 	hash = 0;
 

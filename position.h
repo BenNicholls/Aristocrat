@@ -49,7 +49,6 @@ class Position {
 
     Position();
 	Position(string);
-	void customSetup();
 	void fenParse(string);
 	
 	void generateHash();

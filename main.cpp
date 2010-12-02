@@ -9,9 +9,20 @@ FEATURES
     - Pseudo-legal move generator
     - Piecelists for white and black
     - Evaluation function counts material, because that's all that's important
-    - Broken ass search function that works up to depth 4, but then decides to eat
-      balls.
+    - Alpha-beta Negamax search
 	- Fenboard parser (no checks for FEN validity, so be careful!)
+
+NOTES FOR LATER:
+	- Move zobrist key generator stuff into the position class
+	- Implement zobrist key incremental update
+	- Split up piecelists?
+	- Implement piecelist indexing table
+	- Move ordering, quiesence search
+	- Transposition table
+	- DO all of this stuff
+	- Also, make Aristocrat faster maybe
+	- And better!
+	- Maybe add swearing mode to the interface.
 **********************************************************************************/
 
 #include <iostream>
