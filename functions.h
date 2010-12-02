@@ -9,19 +9,7 @@ NOTES
 
 #pragma once
 
-#include "position.h"
 #include <string>
-
-
-double perft(Position &, int);
-void divide(Position &, int);
-
-int eval(Position &);
-
-int search(Position &, int, int, int, int, Movelist &);
-int rootSearch(Position &, int, int, int, int, Movelist &);
 
 int fromAlgebraic(string);
 string toAlgebraic(int);
-bool perftTestSuite(int);
-int genRandInt(int, int);

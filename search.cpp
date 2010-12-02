@@ -10,14 +10,14 @@ NOTES:
 #include <iostream>
 #include "position.h"
 #include "move.h"
-#include "functions.h"
 #include "movelist.h"
 #include "definitions.h"
+#include "engine.h"
 
-int search(Position &Game, int depth, int alpha, int beta, int colour, Movelist &Variation) {
+int Engine::search(int depth, int alpha, int beta, int colour, Movelist &Variation) {
 	if (depth == 0) {
 		Variation.totalMoves = 0;
-		return colour*eval(Game);
+		return colour*evaluate();
 	}
     else {
 		Movelist nowVariation;
@@ -41,7 +41,7 @@ int search(Position &Game, int depth, int alpha, int beta, int colour, Movelist 
             bool check = Game.doMove(nextMoves.list[i]);
 			if (!check) {
 				mate = false;
-				score = -search(Game, depth - 1, -beta, -alpha, -colour, nowVariation);
+				score = -search(depth - 1, -beta, -alpha, -colour, nowVariation);
 				if (score > alpha) {
 					alpha = score;
 					Variation.totalMoves = 0;
@@ -70,7 +70,7 @@ int search(Position &Game, int depth, int alpha, int beta, int colour, Movelist 
     }
 }
 
-int rootSearch(Position &Game, int depth, int alpha, int beta, int colour, Movelist &Variation) {
+int Engine::rootSearch(int depth, int alpha, int beta, Movelist &Variation) {
 	if (depth == 0) {
 		cout << "Why you do this.";
 		return BAD;
@@ -93,7 +93,7 @@ int rootSearch(Position &Game, int depth, int alpha, int beta, int colour, Movel
             bool check = Game.doMove(nextMoves.list[i]);			
 			if (!check) {
 				mate = false;
-				score = -search(Game, depth - 1, -beta, -alpha, -colour, nowVariation);
+				score = -search(depth - 1, -beta, -alpha, Game.toMove, nowVariation);
 				if (score > alpha) {
 					alpha = score;
 					Variation.totalMoves = 0;
@@ -113,6 +113,6 @@ int rootSearch(Position &Game, int depth, int alpha, int beta, int colour, Movel
 			if (Game.inCheck()) return CHECKMATE;
 			else return 0;
 		}
-        return alpha;
+        return Game.toMove*alpha;
     }
 }

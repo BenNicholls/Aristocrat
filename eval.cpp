@@ -6,14 +6,14 @@
 NOTES:
 	- Evaluation function loops through white pieces and black pieces seperately,
 	  for now just counting material
- **********************************************************************************/
+**********************************************************************************/
 
- #include "functions.h"
- #include "position.h"
- #include "definitions.h"
- #include <iostream>
+#include "position.h"
+#include "definitions.h"
+#include "engine.h"
+#include <iostream>
 
- int eval(Position &Game) {
+int Engine::evaluate() {
 	int score = 0;
 	for (unsigned int i = 0; i < Game.whitePiecelist.size(); i++) {
 		if (Game.whitePiecelist[i] != NOBOARD) {

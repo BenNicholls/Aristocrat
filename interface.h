@@ -4,24 +4,36 @@
 |										   interface.h
 **************************************************************************************************/
 
+#include "engine.h"
 #include "position.h"
 #include "move.h"
 
+
 using namespace std;
 
-void interfaceON(Position);
-void ifaceDisplay(string, Position);
-void ifaceHelp(string);
-void ifaceSetBoard(string, Position &);
-void ifaceDivide(string, Position);
-void ifacePerft(string, Position);
-void ifaceNew(Position &);
-void ifacePerftTest(string, Position);
-void ifaceMove(string, Position &);
-void ifaceUndo(string, Position &);
-void ifaceAbout();
-void ifaceSimpleSearch(string, Position);
-Move ifaceSearch(string, Position, int);
-void ifacePlay(string, string &);
-void ifaceSetDepth(string, int &);
-void ifaceGo(Position &, int, string &);
+class ChessInterface {
+
+	public:
+
+		bool interface_running;
+		Engine Aristocrat;
+		
+		ChessInterface();
+
+		void ifaceRun();
+
+		void ifaceDisplay(string);
+		void ifaceHelp(string);
+		void ifaceSetBoard(string);
+		void ifaceDivide(string);
+		void ifacePerft(string);
+		void ifaceNew();
+		void ifacePerftTest(string);
+		void ifaceMove(string);
+		void ifaceUndo(string);
+		void ifaceAbout();
+		Move ifaceSearch(string);
+		void ifacePlay(string);
+		void ifaceSetDepth(string);
+		void ifaceGo();
+};

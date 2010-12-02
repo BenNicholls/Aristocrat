@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <time.h>
+#include "engine.h"
 #include "interface.h"
 #include "position.h"
 #include "functions.h"
@@ -16,18 +17,16 @@
 
 using namespace std;
 
-void interfaceON(Position Game) {
-
-	bool interface_running = true;
-	string playing = "no";
-	int depth = 6;
-
-
-
+ChessInterface::ChessInterface() {
+	
+	interface_running = true;
 	cout << "Welcome to Aristocrat. Aristocrat likes to play chess. He also likes commmands, like 'help' and 'display'. Go for it, buddy!" << endl;
+}
+
+void ChessInterface::ifaceRun() {
 	
 	while(interface_running) {
-		if (playing == "both" || (playing == "white" && Game.toMove == WHITE) || (playing == "black" && Game.toMove == BLACK)) ifaceGo(Game, depth, playing);
+		if (Aristocrat.myTurn()) ifaceGo();
 		else {
 			cout << endl << "->";
 			string input = "";
@@ -59,20 +58,21 @@ void interfaceON(Position Game) {
 			for (unsigned int i = 0; i < command.size(); i++) command[i] = tolower(command[i]);
 
 			if (command == "quit") interface_running = false;
-			else if (command == "display") ifaceDisplay(parameter, Game);
+			else if (command == "display") ifaceDisplay(parameter);
 			else if (command == "help") ifaceHelp(parameter);
-			else if (command == "setboard") ifaceSetBoard(parameter, Game);
-			else if (command == "divide") ifaceDivide(parameter, Game);
-			else if (command == "perft") ifacePerft(parameter, Game);
-			else if (command == "new" || command == "restart") ifaceNew(Game);
-			else if (command == "testperft") ifacePerftTest(parameter, Game);
-			else if (command == "move") ifaceMove(parameter, Game);
-			else if (command == "undo") ifaceUndo(parameter, Game);
+			else if (command == "setboard") ifaceSetBoard(parameter);
+			else if (command == "divide") ifaceDivide(parameter);
+			else if (command == "perft") ifacePerft(parameter);
+			else if (command == "new" || command == "restart") ifaceNew();
+			else if (command == "testperft") ifacePerftTest(parameter);
+			else if (command == "move") ifaceMove(parameter);
+			else if (command == "undo") ifaceUndo(parameter);
 			else if (command == "about") ifaceAbout();
-			else if (command == "play") ifacePlay(parameter, playing);
-			else if (command == "setdepth") ifaceSetDepth(parameter, depth);
-			else if (command == "go") ifaceGo(Game, depth, playing);
-			else if (command == "search") Move nextMove = ifaceSearch(parameter, Game, depth);
+			else if (command == "play") ifacePlay(parameter);
+			else if (command == "setdepth") ifaceSetDepth(parameter);
+			else if (command == "go") ifaceGo();
+			else if (command == "search") Move nextMove = ifaceSearch(parameter);
+			else if (command == "evaluate") cout << Aristocrat.evaluate();
 			else if (command == "") {}
 			else {
 				cout << "ERROR: ARISTOCRAT AIN'T KNOW WHAT " << command << " MEANS.";
@@ -82,14 +82,14 @@ void interfaceON(Position Game) {
 	}
 }
 
-void ifaceDisplay(string parameter, Position Game) {	
+void ChessInterface::ifaceDisplay(string parameter) {	
 	for (unsigned int i = 0; i < parameter.size(); i++) parameter[i] = tolower(parameter[i]);
-	if (parameter == "more") Game.outputDetails();
-	else if (parameter == "") Game.output();
+	if (parameter == "more") Aristocrat.Game.outputDetails();
+	else if (parameter == "") Aristocrat.Game.output();
 	else cout << "Display what?" << endl;
 }
 
-void ifaceHelp(string parameter) {
+void ChessInterface::ifaceHelp(string parameter) {
 	
 	cout << endl;
 	cout << "Aristocrat understands many commands, much like a butler or slave. Here is a" << endl << "list of them." << endl << endl;
@@ -99,7 +99,7 @@ void ifaceHelp(string parameter) {
 	cout << "e2e4        | Same as move, but faster to type" << endl;
 	cout << "e7e8Q       | Move notation for promotions." << endl;
 	cout << "go          | Make Aristocrat move, regardless of whos turn it is." << endl;
-	cout << "play        | Tell Aristocrat who to play as. (white, black, both, no)" << endl;
+	cout << "play        | Tell Aristocrat who to play as. (white, black, both, none)" << endl;
 	cout << "search #    | Perform a # ply search. No # uses default depth." << endl;
 	cout << "undo        | Undoes a move. 'Undo #' undoes multiple moves at once." << endl;
 	cout << "display     | Shows the board. Type 'display more' for a detailed view" << endl;
@@ -113,7 +113,7 @@ void ifaceHelp(string parameter) {
 	cout << "quit        | Exits the program. But why would you want to?" << endl;
 }
 
-void ifaceAbout() {
+void ChessInterface::ifaceAbout() {
 	cout << "Aristocrat is a chess engine written by Benjamin Nicholls. It is more or" << endl
 		 << "less an adventure in radical dopeness, with a move generator (which I" << endl
 		 <<	"think is extra perfect) and some functions for testing aforementioned" << endl
@@ -121,12 +121,12 @@ void ifaceAbout() {
 		 <<	"be able to actually play some hilariously bad chess. To the future!" << endl;
 }
 
-void ifaceSetBoard(string fen, Position &Game) {
+void ChessInterface::ifaceSetBoard(string fen) {
 	Position newGame(fen);
-	Game = newGame;
+	Aristocrat.Game = newGame;
 }
 
-void ifaceDivide(string parameter, Position Game) {
+void ChessInterface::ifaceDivide(string parameter) {
 	int divNum = atoi(parameter.c_str());
 	if (divNum > 0) {
 		if (divNum > 7) {
@@ -134,18 +134,18 @@ void ifaceDivide(string parameter, Position Game) {
 			cout << "Dude, this might take a while. You sure? (type 'yes') ->";
 			getline(cin, answer);
 			if (answer == "yes") {
-				divide(Game, divNum);
+				Aristocrat.divide(divNum);
 			}
 			else cout << "It's okay." << endl;
 		}
 		else {
-			divide(Game, divNum);
+			Aristocrat.divide(divNum);
 		}
 	}
 	else cout << "Not a valid number for divide. Try 2, or 3 maybe." << endl;
 }
 
-void ifacePerft(string parameter, Position Game) {
+void ChessInterface::ifacePerft(string parameter) {
 	int perftNum = atoi(parameter.c_str());
 	if (perftNum > 0) {
 		if (perftNum > 7) {
@@ -157,7 +157,7 @@ void ifacePerft(string parameter, Position Game) {
 				cout << "Perft " << perftNum << ": ";
 				cout.precision(10);
 				t1 = clock();
-				double count = perft(Game, perftNum);
+				double count = Aristocrat.perft(perftNum);
 				cout << count;
 				t2 = clock();
 				float diff = ((float)t2-(float)t1)/CLOCKS_PER_SEC;
@@ -170,7 +170,7 @@ void ifacePerft(string parameter, Position Game) {
 			cout << "Perft " << perftNum << ": ";
 			cout.precision(10);
 			t1 = clock();
-			double count = perft(Game, perftNum);
+			double count = Aristocrat.perft(perftNum);
 			cout << count;
 			t2 = clock();
 			float diff = ((float)t2-(float)t1)/CLOCKS_PER_SEC;
@@ -180,16 +180,16 @@ void ifacePerft(string parameter, Position Game) {
 	else cout << "Not a valid number for perft. Try 2, or 3 maybe." << endl;
 }
 
-void ifaceNew(Position &Game) {
+void ChessInterface::ifaceNew() {
 	Position newGame;
-	Game = newGame;
+	Aristocrat.Game = newGame;
 }
 
-void ifacePerftTest(string parameter, Position Game) {
+void ChessInterface::ifacePerftTest(string parameter) {
 	if (parameter == "all") {
 		vector<int> fails;
 		for (unsigned int i = 0; i < 126; i++) {
-			bool pass = perftTestSuite(i);
+			bool pass = Aristocrat.perftTestSuite(i);
 			if (!pass) {
 				fails.push_back(i);
 			}
@@ -203,16 +203,16 @@ void ifacePerftTest(string parameter, Position Game) {
 	else {
 		int testNum = atoi(parameter.c_str());
 		if (testNum < 1 || testNum > 126) cout << "You gotta give me a valid test number, boy. 1-126, capeche? Or type 'all' to do all of them.";
-		else bool pass = perftTestSuite(testNum - 1);
+		else bool pass = Aristocrat.perftTestSuite(testNum - 1);
 	}
 }
 
-void ifaceMove(string parameter, Position &Game) {
+void ChessInterface::ifaceMove(string parameter) {
 	int inputtedFromSpace = fromAlgebraic(parameter.substr(0,2));
 	int inputtedToSpace = fromAlgebraic(parameter.substr(2,2));
 
 	Movelist tempMoves;
-	Game.generateMoves(tempMoves);
+	Aristocrat.Game.generateMoves(tempMoves);
 
 	//check if the inputted move is pseudo-legal
 	bool pseudoLegal = false;
@@ -240,16 +240,16 @@ void ifaceMove(string parameter, Position &Game) {
 	//If move was found in the movelist, make the move. If it is illegal, undo!
 	if (!pseudoLegal) cout << "Invalid move. See 'help move' for instructions, dummy.";
 	else {
-		bool check = Game.doMove(inputMove);
+		bool check = Aristocrat.Game.doMove(inputMove);
 		if (check) {
 			cout << "That move is not legal. Do you know the rules?";
-			Game.undoMove();
+			Aristocrat.Game.undoMove();
 		}
-		else Game.output();
+		else Aristocrat.Game.output();
 	}
 }
 
-void ifaceUndo(string parameter, Position &Game) {
+void ChessInterface::ifaceUndo(string parameter) {
 	
 	int numUndos;
 	if (parameter == "") numUndos = 1;
@@ -258,18 +258,21 @@ void ifaceUndo(string parameter, Position &Game) {
 	if (numUndos < 1) cout << "Yeah, I'll get right on that buddy.";
 	else {
 		for (unsigned int i = 0; i < numUndos; i++) {
-			if (Game.halfMoves == 0) break;
-			else Game.undoMove();
+			if (Aristocrat.Game.halfMoves == 0) break;
+			else Aristocrat.Game.undoMove();
 		}
-		Game.output();
+		Aristocrat.Game.output();
 	}
 }
 
-Move ifaceSearch(string parameter, Position Game, int depth) {
+Move ChessInterface::ifaceSearch(string parameter) {
+	int depth;
 	if (parameter != "") depth = atoi(parameter.c_str());
+	else depth = Aristocrat.searchDepth;
+
 	Movelist Variation;
 	if (depth > 0) {
-		int score = Game.toMove*rootSearch(Game, depth, -INFINITY, INFINITY, Game.toMove, Variation);
+		int score = Aristocrat.rootSearch(depth, -INFINITY, INFINITY, Variation);
 		if (abs(score) == CHECKMATE) {
 			cout << "It's checkmate, boy!" << endl;
 			if (Variation.totalMoves > 0) {
@@ -291,29 +294,29 @@ Move ifaceSearch(string parameter, Position Game, int depth) {
 	return Variation.list[0];
 }
 
-void ifacePlay(string parameter, string &playing) {
-	if (parameter == "white") playing = "white";
-	else if (parameter == "black") playing = "black";
-	else if (parameter == "both") playing = "both";
-	else if (parameter == "neither") playing = "no";
+void ChessInterface::ifacePlay(string parameter) {
+	if (parameter == "white") Aristocrat.playing = "white";
+	else if (parameter == "black") Aristocrat.playing = "black";
+	else if (parameter == "both") Aristocrat.playing = "both";
+	else if (parameter == "none") Aristocrat.playing = "none";
 }
-void ifaceSetDepth(string parameter, int &depth) {
+void ChessInterface::ifaceSetDepth(string parameter) {
 	int newDepth = atoi(parameter.c_str());
 
-	if (newDepth > 0) depth = newDepth;
+	if (newDepth > 0) Aristocrat.searchDepth = newDepth;
 	else cout << "Input a positive number to set the depth to.";
 }
 
-void ifaceGo(Position &Game, int depth, string &playing) {
-	Move nextMove = ifaceSearch("", Game, depth);
+void ChessInterface::ifaceGo() {
+	Move nextMove = ifaceSearch("");
 	if (nextMove.fromSpace != 0) {
-		bool check = Game.doMove(nextMove);
-		Game.output();
+		bool check = Aristocrat.Game.doMove(nextMove);
+		Aristocrat.Game.output();
 		cout << "Aristocrat plays ";
 		nextMove.output();
 	}
 	else {
-		playing = "no";
+		Aristocrat.playing = "none";
 	}
 	cout << endl;
 }

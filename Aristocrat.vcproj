@@ -162,6 +162,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\engine.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\eval.cpp"
 				>
 			</File>
@@ -208,7 +212,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\engine.h"
+				>
+			</File>
+			<File
 				RelativePath=".\functions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\hashtable.h"
 				>
 			</File>
 			<File

@@ -38,8 +38,8 @@ class Position {
 	
 	bool WKhistory[5096];
 	bool WQhistory[5096];
-	bool BKhistory[1024];
-	bool BQhistory[1024];
+	bool BKhistory[5096];
+	bool BQhistory[5096];
 	unsigned int enPassantHistory[5096];
 	unsigned int fiftyMoveHistory[5096];
 

@@ -16,7 +16,7 @@ FEATURES
 
 #include <iostream>
 #include <time.h>
-
+#include "engine.h"
 #include "move.h"
 #include "functions.h"
 #include "position.h"
@@ -28,8 +28,8 @@ using namespace std;
 
 int main(){
 
-    Position Game("3k1q2/p3bP2/1p1pQ3/8/5r2/8/PP3PPP/2R1R1K1 b - - 0 32");
-	interfaceON(Game);
+	ChessInterface aristocrat;
+	aristocrat.ifaceRun();
 
     return 0;
 }
