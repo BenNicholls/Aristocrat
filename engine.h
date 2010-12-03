@@ -13,6 +13,7 @@ class Engine {
 
 		//Member objects
 		Position Game;
+		Hashtable Hashes;
 		string playing;    //Who the engine should play. white, black, both, none
 		int searchDepth;
 		

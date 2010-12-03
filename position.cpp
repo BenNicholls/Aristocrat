@@ -112,6 +112,28 @@ void Position::fenParse(string fen){
 	fiftyMove = atoi(FenPieces[11].c_str());
 	totalMoves = atoi(FenPieces[12].c_str());
 	halfMoves = 0;
+
+	keySeed = 998698407;
+
+	blackKey = genRandomKey();
+
+	for (unsigned int i = 0; i < 64; i++) {
+		whitePawnKeys[i] = genRandomKey();
+		whiteKnightKeys[i] = genRandomKey();
+		whiteBishopKeys[i] = genRandomKey();
+		whiteRookKeys[i] = genRandomKey();
+		whiteQueenKeys[i] = genRandomKey();
+		whiteKingKeys[i] = genRandomKey();
+		blackPawnKeys[i] = genRandomKey();
+		blackKnightKeys[i] = genRandomKey();
+		blackBishopKeys[i] = genRandomKey();
+		blackRookKeys[i] = genRandomKey();
+		blackQueenKeys[i] = genRandomKey();
+		blackKingKeys[i] = genRandomKey();
+		if (i < 8) enpassantKeys[i] = genRandomKey();
+		if (i < 4) castleKeys[i] = genRandomKey();
+	}
+
 	generateHash();
 }
 
@@ -216,6 +238,67 @@ void Position::updatePiece(int fromSpace, int toSpace, int side) {
 	}
 }
 
+void Position::updatePieceHash(int fromSpace, int toSpace, int piece) {
+	
+	int from64;
+	int to64;
+
+	if (fromSpace != 0) from64 = 8*(fromSpace/10 - 2) + fromSpace%10 - 1;
+	if (toSpace != 0) to64 = 8*(toSpace/10 - 2) + toSpace%10 - 1;
+
+	switch (piece) {
+		case PAWN:
+			if (fromSpace != 0) hash = hash ^ whitePawnKeys[from64];
+			if (toSpace != 0) hash = hash ^ whitePawnKeys[to64];
+			break;
+		case KNIGHT:
+			if (fromSpace != 0) hash = hash ^ whiteKnightKeys[from64];
+			if (toSpace != 0) hash = hash ^ whiteKnightKeys[to64];
+			break;
+		case BISHOP:
+			if (fromSpace != 0) hash = hash ^ whiteBishopKeys[from64];
+			if (toSpace != 0) hash = hash ^ whiteBishopKeys[to64];
+			break;
+		case ROOK:
+			if (fromSpace != 0) hash = hash ^ whiteRookKeys[from64];
+			if (toSpace != 0) hash = hash ^ whiteRookKeys[to64];
+			break;
+		case QUEEN:
+			if (fromSpace != 0) hash = hash ^ whiteQueenKeys[from64];
+			if (toSpace != 0) hash = hash ^ whiteQueenKeys[to64];
+			break;
+		case KING:
+			if (fromSpace != 0) hash = hash ^ whiteKingKeys[from64];
+			if (toSpace != 0) hash = hash ^ whiteKingKeys[to64];
+			break;
+		case -PAWN:
+			if (fromSpace != 0) hash = hash ^ blackPawnKeys[from64];
+			if (toSpace != 0) hash = hash ^ blackPawnKeys[to64];
+			break;
+		case -KNIGHT:
+			if (fromSpace != 0) hash = hash ^ blackKnightKeys[from64];
+			if (toSpace != 0) hash = hash ^ blackKnightKeys[to64];
+			break;
+		case -BISHOP:
+			if (fromSpace != 0) hash = hash ^ blackBishopKeys[from64];
+			if (toSpace != 0) hash = hash ^ blackBishopKeys[to64];
+			break;
+		case -ROOK:
+			if (fromSpace != 0) hash = hash ^ blackRookKeys[from64];
+			if (toSpace != 0) hash = hash ^ blackRookKeys[to64];
+			break;
+		case -QUEEN:
+			if (fromSpace != 0) hash = hash ^ blackQueenKeys[from64];
+			if (toSpace != 0) hash = hash ^ blackQueenKeys[to64];
+			break;
+		case -KING:
+			if (fromSpace != 0) hash = hash ^ blackKingKeys[from64];
+			if (toSpace != 0) hash = hash ^ blackKingKeys[to64];
+			break;
+	}
+}
+
+
 bool Position::doMove(Move &theMove) {
 	
 	//save history
@@ -225,31 +308,56 @@ bool Position::doMove(Move &theMove) {
 	board[theMove.toSpace] = theMove.piece;
 	board[theMove.fromSpace] = EMPTY;
 	updatePiece(theMove.fromSpace, theMove.toSpace, toMove);
+	updatePieceHash(theMove.fromSpace, theMove.toSpace, theMove.piece);
 
 	//If it is a capture, let's delete the dead guy from the proper piecelist
 	if (theMove.capture != 0) {
 		//For enpassant captures
 		if(theMove.enPassant == true) {
 			removePiece(enPassant + 10*toMove, -toMove);
+			updatePieceHash(enPassant + 10*toMove, 0, theMove.capture);
 			board[enPassant + 10*toMove] = EMPTY;
 		}
-		else removePiece(theMove.toSpace, -toMove);
+		else {
+			removePiece(theMove.toSpace, -toMove);
+			updatePieceHash(theMove.toSpace, 0, theMove.capture);
+		}
 
 		//If a rook is captured, update castle info.
 		if(abs(theMove.capture) == ROOK) {
-			if (castleWK && theMove.toSpace == 98) castleWK = false;
-			else if (castleWQ && theMove.toSpace == 91) castleWQ = false;
-			else if (castleBK && theMove.toSpace == 28) castleBK = false;
-			else if (castleBQ && theMove.toSpace == 21) castleBQ = false;
+			if (castleWK && theMove.toSpace == 98) {
+				castleWK = false;
+				hash = hash ^ castleKeys[0];
+			}
+			else if (castleWQ && theMove.toSpace == 91) {
+				castleWQ = false;
+				hash = hash ^ castleKeys[1];
+			}
+			else if (castleBK && theMove.toSpace == 28) {
+				castleBK = false;
+				hash = hash ^ castleKeys[2];
+			}
+			else if (castleBQ && theMove.toSpace == 21) {
+				hash = hash ^ castleKeys[3];
+				castleBQ = false;
+			}
 		}
 	}
 
 	//Speaking of en passant captures...
-	if (theMove.jump) enPassant = theMove.fromSpace - 10*toMove;
+	if (enPassant != 0) hash = hash ^ enpassantKeys[enPassant%10 - 1];
+	if (theMove.jump) {
+		enPassant = theMove.fromSpace - 10*toMove;
+		hash = hash ^ enpassantKeys[enPassant%10 - 1];
+	}
 	else enPassant = 0;
 
 	//For promotions, we must bring a piece to LIFE!
-	if (theMove.promotion != 0) board[theMove.toSpace] = theMove.promotion*toMove;
+	if (theMove.promotion != 0) {
+		board[theMove.toSpace] = theMove.promotion*toMove;
+		updatePieceHash(0, theMove.toSpace, theMove.promotion*toMove);
+		updatePieceHash(theMove.toSpace, 0, theMove.piece);
+	}
 	
 	//Castling. Hooray. Move the rooks, update piecelists.
 	if (theMove.castle != 0) {
@@ -257,20 +365,24 @@ bool Position::doMove(Move &theMove) {
 			if (toMove == WHITE) {
 				board[98] = EMPTY; board[96] = ROOK;
 				updatePiece(98, 96, WHITE);
+				updatePieceHash(98, 96, ROOK);
 			}
 			else {
 				board[28] = EMPTY; board[26] = -ROOK;
 				updatePiece(28, 26, BLACK);
+				updatePieceHash(28, 26, -ROOK);
 			}
 		}
 		else {
 			if (toMove == WHITE) {
 				board[91] = EMPTY; board[94] = ROOK;
 				updatePiece(91, 94, WHITE);
+				updatePieceHash(91, 94, ROOK);
 			}
 			else {
 				board[21] = EMPTY; board[24] = -ROOK;
 				updatePiece(21, 24, BLACK);
+				updatePieceHash(21, 24, -ROOK);
 			}
 		}
 	}
@@ -279,22 +391,48 @@ bool Position::doMove(Move &theMove) {
 	if (abs(theMove.piece) == KING) {
 		if (toMove == WHITE) {
 			whiteKing = theMove.toSpace;
-			castleWK = false; castleWQ = false;
+			if (castleWK) {
+				castleWK = false; 
+				hash = hash ^ castleKeys[0];
+			}
+			if (castleWQ) {
+				castleWQ = false;
+				hash = hash ^ castleKeys[1];
+			}
 		}
 		else {
 			blackKing = theMove.toSpace;
-			castleBK = false; castleBQ = false;
+			if (castleBK) {
+				castleBK = false;
+				hash = hash ^ castleKeys[2];
+			}
+			if (castleBQ) {
+				castleBQ = false;
+				hash = hash ^ castleKeys[3];
+			}
 		}
 	}
 
 	//Update castling rights for rook moves
 	if (theMove.piece == ROOK) {
-		if (theMove.fromSpace == 91) castleWQ = false;
-		else if (theMove.fromSpace == 98) castleWK = false;
+		if (theMove.fromSpace == 91 && castleWQ) {
+			castleWQ = false;
+			hash = hash ^ castleKeys[1];
+		}
+		else if (theMove.fromSpace == 98 && castleWK){
+			castleWK = false;
+			hash = hash ^ castleKeys[0];
+		}
 	}
 	else if (theMove.piece == -ROOK) {
-		if (theMove.fromSpace == 21) castleBQ = false;
-		else if (theMove.fromSpace == 28) castleBK = false;
+		if (theMove.fromSpace == 21 && castleBQ){
+			castleBQ = false;
+			hash = hash ^ castleKeys[3];
+		}
+		else if (theMove.fromSpace == 28 && castleBK){
+			castleBK = false;
+			hash = hash ^ castleKeys[2];
+		}
 	}
 
 	//Adjust fifty move rule counter
@@ -305,10 +443,11 @@ bool Position::doMove(Move &theMove) {
 	halfMoves++;
 	bool check = inCheck();
 	toMove = -toMove;
+	hash = hash ^ blackKey;
 
 	//update moves made and history
 	movesMade.add(theMove);
-	//generateHash();
+
 	return check;
 }
 
@@ -373,10 +512,9 @@ void Position::undoMove() {
 	castleBQ = BQhistory[halfMoves];
 	enPassant = enPassantHistory[halfMoves];
 	fiftyMove = fiftyMoveHistory[halfMoves];
+	hash = hashHistory[halfMoves];
 
 	movesMade.remove_last();
-	//generateHash();
-
 }
 
 void Position::updateHistory() {
@@ -386,6 +524,7 @@ void Position::updateHistory() {
 	BQhistory[halfMoves] = castleBQ;
 	enPassantHistory[halfMoves] = enPassant;
 	fiftyMoveHistory[halfMoves] = fiftyMove;
+	hashHistory[halfMoves] = hash;
 }
 
 bool Position::inCheck() {
@@ -450,22 +589,22 @@ void Position::generateHash() {
 			case NOBOARD:
 				break;
 			case PAWN:
-				hash = hash ^ Hashes.whitePawnKeys[spot64];
+				hash = hash ^ whitePawnKeys[spot64];
 				break;
 			case KNIGHT:
-				hash = hash ^ Hashes.whitePawnKeys[spot64];
+				hash = hash ^ whiteKnightKeys[spot64];
 				break;
 			case BISHOP:
-				hash = hash ^ Hashes.whitePawnKeys[spot64];
+				hash = hash ^ whiteBishopKeys[spot64];
 				break;
 			case ROOK:
-				hash = hash ^ Hashes.whitePawnKeys[spot64];
+				hash = hash ^ whiteRookKeys[spot64];
 				break;
 			case QUEEN:
-				hash = hash ^ Hashes.whitePawnKeys[spot64];
+				hash = hash ^ whiteQueenKeys[spot64];
 				break;
 			case KING:
-				hash = hash ^ Hashes.whitePawnKeys[spot64];
+				hash = hash ^ whiteKingKeys[spot64];
 				break;
 		}
 	}
@@ -473,37 +612,43 @@ void Position::generateHash() {
 	for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
 		int spot = blackPiecelist[i];
 		int spot64 = 8*(spot/10 - 2) + spot%10 - 1;
-		switch (abs(board[spot])) {
+		switch (board[spot]) {
 			case NOBOARD:
 				break;
-			case PAWN:
-				hash = hash ^ Hashes.blackPawnKeys[spot64];
+			case -PAWN:
+				hash = hash ^ blackPawnKeys[spot64];
 				break;
-			case KNIGHT:
-				hash = hash ^ Hashes.blackPawnKeys[spot64];
+			case -KNIGHT:
+				hash = hash ^ blackKnightKeys[spot64];
 				break;
-			case BISHOP:
-				hash = hash ^ Hashes.blackPawnKeys[spot64];
+			case -BISHOP:
+				hash = hash ^ blackBishopKeys[spot64];
 				break;
-			case ROOK:
-				hash = hash ^ Hashes.blackPawnKeys[spot64];
+			case -ROOK:
+				hash = hash ^ blackRookKeys[spot64];
 				break;
-			case QUEEN:
-				hash = hash ^ Hashes.blackPawnKeys[spot64];
+			case -QUEEN:
+				hash = hash ^ blackQueenKeys[spot64];
 				break;
-			case KING:
-				hash = hash ^ Hashes.blackPawnKeys[spot64];
+			case -KING:
+				hash = hash ^ blackKingKeys[spot64];
 				break;
 		}
 	}
 	
-	if (castleWK) hash = hash ^ Hashes.castleKeys[0];
-	if (castleWQ) hash = hash ^ Hashes.castleKeys[1];
-	if (castleBK) hash = hash ^ Hashes.castleKeys[2];
-	if (castleBQ) hash = hash ^ Hashes.castleKeys[3];
+	if (castleWK) hash = hash ^ castleKeys[0];
+	if (castleWQ) hash = hash ^ castleKeys[1];
+	if (castleBK) hash = hash ^ castleKeys[2];
+	if (castleBQ) hash = hash ^ castleKeys[3];
 
-	if (enPassant != 0) hash = hash ^ Hashes.enpassantKeys[enPassant%10-1];
+	if (enPassant != 0) hash = hash ^ enpassantKeys[enPassant%10-1];
 
-	if (toMove == BLACK) hash = hash ^ Hashes.blackKey;
+	if (toMove == BLACK) hash = hash ^ blackKey;
 }
 
+unsigned long long Position::genRandomKey() {
+	unsigned long long random;
+	random = (214013*keySeed + 2531011)% 0x1000000000;
+	keySeed = random;
+	return random;
+}
