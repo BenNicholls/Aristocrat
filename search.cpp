@@ -64,8 +64,6 @@ int Engine::search(int depth, int alpha, int beta, int colour, Movelist &Variati
 			}
 			else return 0;
 		}
-
-
         return alpha;
     }
 }

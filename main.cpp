@@ -11,10 +11,9 @@ FEATURES
     - Evaluation function counts material, because that's all that's important
     - Alpha-beta Negamax search
 	- Fenboard parser (no checks for FEN validity, so be careful!)
+	- Hashtable what can log hashes
 
 NOTES FOR LATER:
-	- Move zobrist key generator stuff into the position class
-	- Implement zobrist key incremental update
 	- Split up piecelists?
 	- Implement piecelist indexing table
 	- Move ordering, quiesence search
@@ -39,8 +38,13 @@ using namespace std;
 
 int main(){
 
-	ChessInterface aristocrat;
-	aristocrat.ifaceRun();
+	ChessInterface iface;
+	Move theMove;
+	iface.Aristocrat.Hashes.LogHash(50,3,theMove, 9, 40, 8);
+	int i = 50%HASHTABLESIZE;
+	cout << iface.Aristocrat.Hashes.Table[i].used;
+	cout << iface.Aristocrat.Hashes.CheckTable(50);
+	iface.ifaceRun();
 
     return 0;
 }

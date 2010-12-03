@@ -101,12 +101,20 @@ bool Engine::perftTestSuite(int lineNum) {
 double Engine::perft(int depth) {
 	if (depth == 0) return 1;
 	double movecount = 0;
+	Move aMove;
 	Movelist theMoves;
 	Game.generateMoves(theMoves);
 	for (unsigned int i = 0; i < theMoves.totalMoves; i++) {
 		bool check = Game.doMove(theMoves.list[i]);
 		if (check == false) { 
-			movecount += perft(depth - 1);
+			if(Hashes.CheckTable(Game.hash) && Hashes.getDepth(Game.hash) == depth) {
+				movecount += Hashes.getNodes(Game.hash);
+			}
+			else {
+				double count = perft(depth - 1);
+				Hashes.LogHash(Game.hash, 0, aMove, 0, depth, count);
+				movecount += count;
+			}
 		}
 		Game.undoMove();
 	}

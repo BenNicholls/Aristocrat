@@ -447,7 +447,6 @@ bool Position::doMove(Move &theMove) {
 
 	//update moves made and history
 	movesMade.add(theMove);
-
 	return check;
 }
 
