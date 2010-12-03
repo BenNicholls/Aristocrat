@@ -21,17 +21,17 @@ void Hashtable::LogHash(unsigned long long newHash, int newScore, Move newMove, 
 	if (!Table[i].used) {
 		Table[i].hash = newHash;
 		Table[i].score = newScore;
-		//Table[i].bestMove = newMove;
+		Table[i].bestMove = newMove;
 		Table[i].depth = newDepth;
 		Table[i].nodes = newNodes;
 		Table[i].used = true;
 	}
 	else {
-		//Same position. Okay. Replace if depth is higher.
+		//Whoop. Okay. Replace if depth is higher.
 		if (newDepth > Table[i].depth) {
 			Table[i].hash = newHash;
 			Table[i].score = newScore;
-			//Table[i].bestMove = newMove;
+			Table[i].bestMove = newMove;
 			Table[i].depth = newDepth;
 			Table[i].nodes = newNodes;
 		}
@@ -39,41 +39,32 @@ void Hashtable::LogHash(unsigned long long newHash, int newScore, Move newMove, 
 }
 
 HashtableEntry Hashtable::GetEntry(unsigned long long hash) {
-	int i = hash % HASHTABLESIZE;
-	return Table[i];
+	return Table[hash % HASHTABLESIZE];
 }
 
 bool Hashtable::CheckTable(unsigned long long hash) {
 	int i = hash % HASHTABLESIZE;
-	if (Table[i].used){
-		if (Table[i].hash == hash) return true;
-		else return false;
-	}
+	if (Table[i].used && Table[i].hash == hash) return true;
 	else return false;
 }
 
 int Hashtable::getScore(unsigned long long hash) {
-	int i = hash % HASHTABLESIZE;
-	return Table[i].score;
+	return Table[hash % HASHTABLESIZE].score;
 }
 
-//Move Hashtable::getMove(unsigned long long hash) {
-//	int i = hash % HASHTABLESIZE;
-//	return Table[i].bestMove;
-//}
+Move Hashtable::getMove(unsigned long long hash) {
+	return Table[hash % HASHTABLESIZE].bestMove;
+}
 
 int Hashtable::getMoveType(unsigned long long hash) {
-	int i = hash % HASHTABLESIZE;
-	return Table[i].moveType;
+	return Table[hash % HASHTABLESIZE].moveType;
 }
 
 int Hashtable::getDepth(unsigned long long hash) {
-	int i = hash % HASHTABLESIZE;
-	return Table[i].depth;
+	return Table[hash % HASHTABLESIZE].depth;
 }
 
 double Hashtable::getNodes(unsigned long long hash) {
-	int i = hash % HASHTABLESIZE;
-	return Table[i].nodes;
+	return Table[hash % HASHTABLESIZE].nodes;
 }
 	

@@ -40,5 +40,8 @@ class Movelist {
 
 		void add(Move);
 		void remove_last();
+
+		void sort();
+
 		void output();
 };

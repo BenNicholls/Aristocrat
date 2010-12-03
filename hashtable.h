@@ -11,7 +11,7 @@ class HashtableEntry {
 		
 		unsigned long long hash;
 		int score;
-		//Move bestMove;
+		Move bestMove;
 		int moveType;
 		int depth;
 		double nodes;
@@ -41,11 +41,9 @@ class Hashtable {
 
 		//Retreival functions
 		int getScore(unsigned long long);
-		//Move getMove(unsigned long long);
+		Move getMove(unsigned long long);
 		int getMoveType(unsigned long long);
 		int getDepth(unsigned long long);
 		double getNodes(unsigned long long);
-		
-
 };
 

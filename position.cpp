@@ -113,7 +113,7 @@ void Position::fenParse(string fen){
 	totalMoves = atoi(FenPieces[12].c_str());
 	halfMoves = 0;
 
-	keySeed = 998698407;
+	keySeed = 80;
 
 	blackKey = genRandomKey();
 
@@ -647,7 +647,10 @@ void Position::generateHash() {
 
 unsigned long long Position::genRandomKey() {
 	unsigned long long random;
-	random = (214013*keySeed + 2531011)% 0x1000000000;
+	unsigned long long a = 6364136223846793005;
+	unsigned long long c = 1442695040888963407;
+	unsigned long long m = 0x1000000000000000;
+	random = (a*keySeed + c)% m;
 	keySeed = random;
 	return random;
 }

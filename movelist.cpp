@@ -71,3 +71,6 @@ void Movelist::output() {
 		cout << endl;
 	}
 }
+
+void Movelist::sort() { }
+
