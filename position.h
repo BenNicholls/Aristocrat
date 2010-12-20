@@ -29,16 +29,22 @@ class Position {
     bool castleBK;
     bool castleBQ;
     unsigned int fiftyMove;                   //Number of half moves played
-    unsigned int whiteKing;                        //Stores location of white and black king
-    unsigned int blackKing;
 	unsigned int totalMoves;
 	unsigned int halfMoves;
 	unsigned long long hash;
 
 
-    vector<int> whitePiecelist;           //Piecelists hold the position of each piece,
-    vector<int> blackPiecelist;           //and a piece is simply deleted from the vector when captured
+	//Piecelist variables
 	
+	//The first index is for side. 0 for white, 1 for black. The second index for pieces
+	//in the usual way.
+	unsigned int pieceLists[2][6][10];
+	unsigned int pieceListTotals[2][6];
+    unsigned int whiteKing;
+    unsigned int blackKing;
+	
+	unsigned int pieceIndexTable[120];
+
 	//Zobrist Hash Creation Keys
 	unsigned long long whitePawnKeys[64];
 	unsigned long long whiteKnightKeys[64];
@@ -75,14 +81,19 @@ class Position {
 	void updatePieceHash(int, int, int);
     void output();
 	void outputDetails();
-	void removePiece(int, int);
-	void addPiece(int, int);
-	void updatePiece(int, int, int);
+	void updatePieceList(int, int, int);
 	void updateHistory();
 	bool doMove(Move &);
 	void undoMove();
 	bool isAttacked(int);
 	bool inCheck();
 	void generateMoves(Movelist &);
+	void generatePawnMoves(Movelist &, int);
+	void generateKnightMoves(Movelist &, int);
+	void generateBishopMoves(Movelist &, int);
+	void generateRookMoves(Movelist &, int);
+	void generateQueenMoves(Movelist &, int);
+	void generateKingMoves(Movelist &, int);
+
 	unsigned long long genRandomKey();
 };

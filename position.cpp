@@ -35,6 +35,17 @@ Position::Position(){
 //done to validate the fen string. Make sure it is good!
 void Position::fenParse(string fen){
 
+	pieceListTotals[0][PAWN] = 0;
+	pieceListTotals[0][KNIGHT] = 0;
+	pieceListTotals[0][BISHOP] = 0;
+	pieceListTotals[0][ROOK] = 0;
+	pieceListTotals[0][QUEEN] = 0;
+	pieceListTotals[1][PAWN] = 0;
+	pieceListTotals[1][KNIGHT] = 0;
+	pieceListTotals[1][BISHOP] = 0;
+	pieceListTotals[1][ROOK] = 0;
+	pieceListTotals[1][QUEEN] = 0;
+
 	//Clears the board, sets up NOBOARD zones.
 	for (int i = 0; i < 120; i++) {
 		if (i/10 < 2 || i/10 > 9 || i%10 == 0 || i%10 == 9) board[i] = NOBOARD;
@@ -63,18 +74,18 @@ void Position::fenParse(string fen){
 		for (unsigned int j = 0; j < FenPieces[i].size(); j++) {
 			int space = 21+i*10+pos;
 			switch(FenPieces[i][j]){
-				case 'r': board[space] = -ROOK; blackPiecelist.push_back(space); pos++; break;
-				case 'n': board[space] = -KNIGHT; blackPiecelist.push_back(space); pos++; break;
-				case 'b': board[space] = -BISHOP; blackPiecelist.push_back(space); pos++; break;
-				case 'q': board[space] = -QUEEN; blackPiecelist.push_back(space); pos++; break;
-				case 'k': board[space] = -KING; blackPiecelist.push_back(space); blackKing = space; pos++; break;
-				case 'p': board[space] = -PAWN; blackPiecelist.push_back(space); pos++; break;
-				case 'R': board[space] = ROOK; whitePiecelist.push_back(space); pos++; break;
-				case 'N': board[space] = KNIGHT; whitePiecelist.push_back(space); pos++; break;
-				case 'B': board[space] = BISHOP; whitePiecelist.push_back(space); pos++; break;
-				case 'Q': board[space] = QUEEN; whitePiecelist.push_back(space); pos++; break;
-				case 'K': board[space] = KING; whitePiecelist.push_back(space); whiteKing = space; pos++; break;
-				case 'P': board[space] = PAWN; whitePiecelist.push_back(space); pos++; break;
+				case 'r': board[space] = -ROOK; updatePieceList(0, space, -ROOK); pos++; break;
+				case 'n': board[space] = -KNIGHT; updatePieceList(0, space, -KNIGHT); pos++; break;
+				case 'b': board[space] = -BISHOP; updatePieceList(0, space, -BISHOP); pos++; break;
+				case 'q': board[space] = -QUEEN; updatePieceList(0, space, -QUEEN); pos++; break;
+				case 'k': board[space] = -KING; blackKing = space; pos++; break;
+				case 'p': board[space] = -PAWN; updatePieceList(0, space, -PAWN); pos++; break;
+				case 'R': board[space] = ROOK; updatePieceList(0, space, ROOK); pos++; break;
+				case 'N': board[space] = KNIGHT; updatePieceList(0, space, KNIGHT); pos++; break;
+				case 'B': board[space] = BISHOP; updatePieceList(0, space, BISHOP); pos++; break;
+				case 'Q': board[space] = QUEEN; updatePieceList(0, space, QUEEN); pos++; break;
+				case 'K': board[space] = KING; whiteKing = space; pos++; break;
+				case 'P': board[space] = PAWN; updatePieceList(0, space, PAWN); pos++; break;
 				case '1': pos += 1; break;
 				case '2': pos += 2; break;
 				case '3': pos += 3; break;
@@ -165,13 +176,13 @@ void Position::outputDetails() {
 	cout << endl;
 	cout << "Fiftymove counter: " << fiftyMove << ". Total moves: " << totalMoves << endl;
 	cout << "White pieces are located on: ";
-	for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
-		if (whitePiecelist[i] != NOBOARD) cout << toAlgebraic(whitePiecelist[i]) << " ";
+	for (unsigned int i = 1; i < 6; i++) {
+		for (unsigned int j = 0; j < pieceListTotals[0][i]; j++) cout << toAlgebraic(pieceLists[0][i][j]) << " ";
 	}
 	cout << endl;
 	cout << "Black pieces are located on: ";
-	for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
-		if (blackPiecelist[i] != NOBOARD) cout << toAlgebraic(blackPiecelist[i]) << " ";
+	for (unsigned int i = 1; i < 6; i++) {
+		for (unsigned int j = 0; j < pieceListTotals[1][i]; j++) cout << toAlgebraic(pieceLists[1][i][j]) << " ";
 	}
 	cout << endl;
 	if (enPassant != 0) cout << "En Passant square is: " << toAlgebraic(enPassant) << endl;
@@ -179,61 +190,21 @@ void Position::outputDetails() {
 	cout << "Hashkey: " << hash << endl;
 }
 
-void Position::removePiece(int space, int side) {
-	
-	if (side == WHITE) {
-		for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
-			if (whitePiecelist[i] == space) {
-				whitePiecelist[i] = NOBOARD;
-				break;
-			}
+void Position::updatePieceList(int fromSpace, int toSpace, int piece) {
+	if (abs(piece) != KING) {
+		int fromIndex, side;
+		if (fromSpace != 0) fromIndex = pieceIndexTable[fromSpace];
+		if (piece > 0) side = 0;
+		else side = 1;
+		if (fromSpace != 0) {
+				pieceListTotals[side][abs(piece)]--;
+				pieceLists[side][abs(piece)][fromIndex] = pieceLists[side][abs(piece)][pieceListTotals[side][abs(piece)]];
+				pieceIndexTable[pieceLists[side][abs(piece)][fromIndex]] = fromIndex;
 		}
-	}
-	else {
-		for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
-			if (blackPiecelist[i] == space) {
-				blackPiecelist[i] = NOBOARD;
-				break;
-			}
-		}
-	}
-}
-void Position::addPiece(int space, int side) {
-	
-	if (side == WHITE) {
-		for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
-			if (whitePiecelist[i] == NOBOARD) {
-				whitePiecelist[i] = space;
-				break;
-			}
-		}
-	}
-	else {
-		for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
-			if (blackPiecelist[i] == NOBOARD) {
-				blackPiecelist[i] = space;
-				break;
-			}
-		}
-	}
-}
-
-void Position::updatePiece(int fromSpace, int toSpace, int side) {
-	
-	if (side == WHITE) {
-		for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
-			if (whitePiecelist[i] == fromSpace) {
-				whitePiecelist[i] = toSpace;
-				break;
-			}
-		}
-	}
-	else {
-		for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
-			if (blackPiecelist[i] == fromSpace) {
-				blackPiecelist[i] = toSpace;
-				break;
-			}
+		if (toSpace != 0) {
+				pieceLists[side][abs(piece)][pieceListTotals[side][abs(piece)]] = toSpace;
+				pieceIndexTable[toSpace] = pieceListTotals[side][abs(piece)];
+				pieceListTotals[side][abs(piece)]++;
 		}
 	}
 }
@@ -298,7 +269,6 @@ void Position::updatePieceHash(int fromSpace, int toSpace, int piece) {
 	}
 }
 
-
 bool Position::doMove(Move &theMove) {
 	
 	//save history
@@ -307,19 +277,19 @@ bool Position::doMove(Move &theMove) {
 	//First up: move the piece on the board, update piecelist
 	board[theMove.toSpace] = theMove.piece;
 	board[theMove.fromSpace] = EMPTY;
-	updatePiece(theMove.fromSpace, theMove.toSpace, toMove);
+	updatePieceList(theMove.fromSpace, theMove.toSpace, theMove.piece);
 	updatePieceHash(theMove.fromSpace, theMove.toSpace, theMove.piece);
 
 	//If it is a capture, let's delete the dead guy from the proper piecelist
 	if (theMove.capture != 0) {
 		//For enpassant captures
 		if(theMove.enPassant == true) {
-			removePiece(enPassant + 10*toMove, -toMove);
+			updatePieceList(enPassant + 10*toMove, 0, -PAWN*toMove);
 			updatePieceHash(enPassant + 10*toMove, 0, theMove.capture);
 			board[enPassant + 10*toMove] = EMPTY;
 		}
 		else {
-			removePiece(theMove.toSpace, -toMove);
+			updatePieceList(theMove.toSpace, 0, theMove.capture);
 			updatePieceHash(theMove.toSpace, 0, theMove.capture);
 		}
 
@@ -355,6 +325,8 @@ bool Position::doMove(Move &theMove) {
 	//For promotions, we must bring a piece to LIFE!
 	if (theMove.promotion != 0) {
 		board[theMove.toSpace] = theMove.promotion*toMove;
+		updatePieceList(theMove.toSpace, 0, theMove.piece);
+		updatePieceList(0, theMove.toSpace, theMove.promotion*toMove);
 		updatePieceHash(0, theMove.toSpace, theMove.promotion*toMove);
 		updatePieceHash(theMove.toSpace, 0, theMove.piece);
 	}
@@ -364,24 +336,24 @@ bool Position::doMove(Move &theMove) {
 		if (theMove.castle == 1) {
 			if (toMove == WHITE) {
 				board[98] = EMPTY; board[96] = ROOK;
-				updatePiece(98, 96, WHITE);
+				updatePieceList(98, 96, ROOK);
 				updatePieceHash(98, 96, ROOK);
 			}
 			else {
 				board[28] = EMPTY; board[26] = -ROOK;
-				updatePiece(28, 26, BLACK);
+				updatePieceList(28, 26, -ROOK);
 				updatePieceHash(28, 26, -ROOK);
 			}
 		}
 		else {
 			if (toMove == WHITE) {
 				board[91] = EMPTY; board[94] = ROOK;
-				updatePiece(91, 94, WHITE);
+				updatePieceList(91, 94, ROOK);
 				updatePieceHash(91, 94, ROOK);
 			}
 			else {
 				board[21] = EMPTY; board[24] = -ROOK;
-				updatePiece(21, 24, BLACK);
+				updatePieceList(21, 24, -ROOK);
 				updatePieceHash(21, 24, -ROOK);
 			}
 		}
@@ -457,19 +429,19 @@ void Position::undoMove() {
 
 	//Move piece back
 	board[theMove.fromSpace] = theMove.piece;
-	updatePiece(theMove.toSpace, theMove.fromSpace, toMove);
+	updatePieceList(theMove.toSpace, theMove.fromSpace, theMove.piece);
 
 	//If a piece was captured, put it back, you!
 	if (theMove.capture != 0) {
 		//If it was an en passant capture
 		if (theMove.enPassant) {
 			board[theMove.toSpace + 10*toMove] = -PAWN*toMove;
-			addPiece(theMove.toSpace +10*toMove, -toMove);
+			updatePieceList(0, theMove.toSpace +10*toMove, -PAWN*toMove);
 			board[theMove.toSpace] = EMPTY;
 		}
 		else {
 			board[theMove.toSpace] = theMove.capture;
-			addPiece(theMove.toSpace, -toMove);
+			updatePieceList(0, theMove.toSpace, theMove.capture);
 		}
 	}
 	else board[theMove.toSpace] = EMPTY;
@@ -484,21 +456,21 @@ void Position::undoMove() {
 		if (toMove == WHITE) {
 			if (theMove.castle == 1) {
 				board[96] = EMPTY; board[98] = ROOK;
-				updatePiece(96, 98, WHITE);
+				updatePieceList(96, 98, ROOK);
 			}
 			else {
 				board[94] = EMPTY; board[91] = ROOK;
-				updatePiece(94, 91, WHITE);
+				updatePieceList(94, 91, ROOK);
 			}
 		}
 		else {
 			if (theMove.castle == 1) {
 				board[26] = EMPTY; board[28] = -ROOK;
-				updatePiece(26, 28, BLACK);
+				updatePieceList(26, 28, -ROOK);
 			}
 			else {
 				board[24] = EMPTY; board[21] = -ROOK;
-				updatePiece(24, 21, BLACK);
+				updatePieceList(24, 21, -ROOK);
 			}
 		}
 	}
@@ -512,7 +484,6 @@ void Position::undoMove() {
 	enPassant = enPassantHistory[halfMoves];
 	fiftyMove = fiftyMoveHistory[halfMoves];
 	hash = hashHistory[halfMoves];
-
 	movesMade.remove_last();
 }
 
@@ -580,60 +551,19 @@ bool Position::isAttacked(int square) {
 
 void Position::generateHash() {
 	hash = 0;
-
-	for (unsigned int i = 0; i < whitePiecelist.size(); i++) {
-		int spot = whitePiecelist[i];
-		int spot64 = 8*(spot/10 - 2) + spot%10 - 1;
-		switch (board[spot]) {
-			case NOBOARD:
-				break;
-			case PAWN:
-				hash = hash ^ whitePawnKeys[spot64];
-				break;
-			case KNIGHT:
-				hash = hash ^ whiteKnightKeys[spot64];
-				break;
-			case BISHOP:
-				hash = hash ^ whiteBishopKeys[spot64];
-				break;
-			case ROOK:
-				hash = hash ^ whiteRookKeys[spot64];
-				break;
-			case QUEEN:
-				hash = hash ^ whiteQueenKeys[spot64];
-				break;
-			case KING:
-				hash = hash ^ whiteKingKeys[spot64];
-				break;
-		}
-	}
-
-	for (unsigned int i = 0; i < blackPiecelist.size(); i++) {
-		int spot = blackPiecelist[i];
-		int spot64 = 8*(spot/10 - 2) + spot%10 - 1;
-		switch (board[spot]) {
-			case NOBOARD:
-				break;
-			case -PAWN:
-				hash = hash ^ blackPawnKeys[spot64];
-				break;
-			case -KNIGHT:
-				hash = hash ^ blackKnightKeys[spot64];
-				break;
-			case -BISHOP:
-				hash = hash ^ blackBishopKeys[spot64];
-				break;
-			case -ROOK:
-				hash = hash ^ blackRookKeys[spot64];
-				break;
-			case -QUEEN:
-				hash = hash ^ blackQueenKeys[spot64];
-				break;
-			case -KING:
-				hash = hash ^ blackKingKeys[spot64];
-				break;
-		}
-	}
+	for (unsigned int i = 0; i < pieceListTotals[0][PAWN]; i++) hash = hash ^ whitePawnKeys[pieceLists[0][PAWN][i]];
+	for (unsigned int i = 0; i < pieceListTotals[0][KNIGHT]; i++) hash = hash ^ whiteKnightKeys[pieceLists[0][KNIGHT][i]];
+	for (unsigned int i = 0; i < pieceListTotals[0][BISHOP]; i++) hash = hash ^ whiteBishopKeys[pieceLists[0][BISHOP][i]];
+	for (unsigned int i = 0; i < pieceListTotals[0][ROOK]; i++) hash = hash ^ whiteRookKeys[pieceLists[0][ROOK][i]];
+	for (unsigned int i = 0; i < pieceListTotals[0][QUEEN]; i++) hash = hash ^ whiteQueenKeys[pieceLists[0][QUEEN][i]];
+	for (unsigned int i = 0; i < pieceListTotals[1][PAWN]; i++) hash = hash ^ blackPawnKeys[pieceLists[1][PAWN][i]];
+	for (unsigned int i = 0; i < pieceListTotals[1][KNIGHT]; i++) hash = hash ^ blackKnightKeys[pieceLists[1][KNIGHT][i]];
+	for (unsigned int i = 0; i < pieceListTotals[1][BISHOP]; i++) hash = hash ^ blackBishopKeys[pieceLists[1][BISHOP][i]];
+	for (unsigned int i = 0; i < pieceListTotals[1][ROOK]; i++) hash = hash ^ blackRookKeys[pieceLists[1][ROOK][i]];
+	for (unsigned int i = 0; i < pieceListTotals[1][QUEEN]; i++) hash = hash ^ blackQueenKeys[pieceLists[1][QUEEN][i]];
+	
+	hash = hash ^ whiteKingKeys[whiteKing];
+	hash = hash ^ blackKingKeys[blackKing];
 	
 	if (castleWK) hash = hash ^ castleKeys[0];
 	if (castleWQ) hash = hash ^ castleKeys[1];

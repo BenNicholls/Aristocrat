@@ -15,56 +15,47 @@ NOTES:
 
 int Engine::evaluate() {
 	int score = 0;
-	for (unsigned int i = 0; i < Game.whitePiecelist.size(); i++) {
-		if (Game.whitePiecelist[i] != NOBOARD) {
-			score += PIECEVALUE[Game.board[Game.whitePiecelist[i]]];
-			switch (Game.board[Game.whitePiecelist[i]]) {
-				case PAWN:
-					score += pawnSpaceTable[119 - Game.whitePiecelist[i]];
-					break;
-				case KNIGHT:
-					score += knightSpaceTable[119 - Game.whitePiecelist[i]];
-					break;
-				case BISHOP:
-					score += bishopSpaceTable[119 - Game.whitePiecelist[i]];
-					break; 
-				case ROOK:
-					score += rookSpaceTable[119 - Game.whitePiecelist[i]];
-					break; 
-				case QUEEN:
-					score += queenSpaceTable[119 - Game.whitePiecelist[i]];
-					break; 
-				case KING:
-					score += kingSpaceTable[119 - Game.whitePiecelist[i]];
-					break; 
-			}
-		}
+
+	for (unsigned int i = 0; i < Game.pieceListTotals[0][PAWN]; i++) {
+		score += PIECEVALUE[PAWN];
+		score += pawnSpaceTable[119 - Game.pieceLists[0][PAWN][i]];
+	}
+	for (unsigned int i = 0; i < Game.pieceListTotals[0][KNIGHT]; i++) {
+		score += PIECEVALUE[KNIGHT];
+		score += pawnSpaceTable[119 - Game.pieceLists[0][KNIGHT][i]];
+	}
+	for (unsigned int i = 0; i < Game.pieceListTotals[0][BISHOP]; i++) {
+		score += PIECEVALUE[BISHOP];
+		score += pawnSpaceTable[119 - Game.pieceLists[0][BISHOP][i]];
+	}
+	for (unsigned int i = 0; i < Game.pieceListTotals[0][ROOK]; i++) {
+		score += PIECEVALUE[ROOK];
+		score += pawnSpaceTable[119 - Game.pieceLists[0][ROOK][i]];
+	}
+	for (unsigned int i = 0; i < Game.pieceListTotals[0][QUEEN]; i++) {
+		score += PIECEVALUE[QUEEN];
+		score += pawnSpaceTable[119 - Game.pieceLists[0][QUEEN][i]];
+	}
+	for (unsigned int i = 0; i < Game.pieceListTotals[1][PAWN]; i++) {
+		score -= PIECEVALUE[PAWN];
+		score -= pawnSpaceTable[Game.pieceLists[1][PAWN][i]];
+	}
+	for (unsigned int i = 0; i < Game.pieceListTotals[1][KNIGHT]; i++) {
+		score -= PIECEVALUE[KNIGHT];
+		score -= pawnSpaceTable[Game.pieceLists[1][KNIGHT][i]];
+	}
+	for (unsigned int i = 0; i < Game.pieceListTotals[1][BISHOP]; i++) {
+		score -= PIECEVALUE[BISHOP];
+		score -= pawnSpaceTable[Game.pieceLists[1][BISHOP][i]];
+	}
+	for (unsigned int i = 0; i < Game.pieceListTotals[1][ROOK]; i++) {
+		score -= PIECEVALUE[ROOK];
+		score -= pawnSpaceTable[Game.pieceLists[1][ROOK][i]];
+	}
+	for (unsigned int i = 0; i < Game.pieceListTotals[1][QUEEN]; i++) {
+		score -= PIECEVALUE[QUEEN];
+		score -= pawnSpaceTable[Game.pieceLists[1][QUEEN][i]];
 	}
 
-	for (unsigned int i = 0; i < Game.blackPiecelist.size(); i++) {
-		if (Game.blackPiecelist[i] != NOBOARD) {
-			score -= PIECEVALUE[abs(Game.board[Game.blackPiecelist[i]])];
-			switch (abs(Game.board[Game.blackPiecelist[i]])) {
-				case PAWN:
-					score -= pawnSpaceTable[Game.blackPiecelist[i]];
-					break;
-				case KNIGHT:
-					score -= knightSpaceTable[Game.blackPiecelist[i]];
-					break;
-				case BISHOP:
-					score -= bishopSpaceTable[Game.blackPiecelist[i]];
-					break; 
-				case ROOK:
-					score -= rookSpaceTable[Game.blackPiecelist[i]];
-					break; 
-				case QUEEN:
-					score -= queenSpaceTable[Game.blackPiecelist[i]];
-					break; 
-				case KING:
-					score -= kingSpaceTable[Game.blackPiecelist[i]];
-					break; 
-			}
-		}
-	}
 	return score;
 }
