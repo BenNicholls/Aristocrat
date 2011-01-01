@@ -224,7 +224,7 @@ void ChessInterface::ifaceMove(string parameter) {
 		if (tempMoves.list[i].fromSpace == inputtedFromSpace && tempMoves.list[i].toSpace == inputtedToSpace) {
 			if (tempMoves.list[i].promotion != 0) {
 				if (parameter.size() == 5) {
-					if (toupper(parameter[4]) == PIECESHORT[tempMoves.list[i].promotion][0]) {
+					if (toupper(parameter[4]) == PIECESHORT[abs(tempMoves.list[i].promotion)][0]) {
 						inputMove = tempMoves.list[i];
 						pseudoLegal = true;
 						break;

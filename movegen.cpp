@@ -9,7 +9,7 @@ void Position::generatePawnMoves(Movelist &Moves, int side) {
 			if (board[pieceSpace - 10*toMove] == EMPTY) {
 				//Check if piece is about to promote!
 				if (pieceSpace >= (56-(25*toMove)) && pieceSpace < (64-(25*toMove)))
-					Moves.add_promos(pieceSpace, pieceSpace - 10*toMove, EMPTY); 
+					Moves.add_promos(pieceSpace, pieceSpace - 10*toMove, EMPTY, toMove); 
 				else {
 					int to = pieceSpace - 10*toMove;
 					Moves.add_move(pieceSpace, to);
@@ -22,7 +22,7 @@ void Position::generatePawnMoves(Movelist &Moves, int side) {
 			if (board[pieceSpace - 11*toMove]*toMove < 0 && board[pieceSpace - 11*toMove] != NOBOARD) {
 				//Check for capture promotion
 				if (pieceSpace >= (56-(25*toMove)) && pieceSpace < (64-(25*toMove)))
-					Moves.add_promos(pieceSpace, pieceSpace - 11*toMove, board[pieceSpace - 11*toMove]);
+					Moves.add_promos(pieceSpace, pieceSpace - 11*toMove, board[pieceSpace - 11*toMove], toMove);
 				else {
 					int to = pieceSpace - 11*toMove;
 					Moves.add_capture(pieceSpace, to, board[pieceSpace - 11*toMove]);
@@ -35,7 +35,7 @@ void Position::generatePawnMoves(Movelist &Moves, int side) {
 			if (board[pieceSpace - 9*toMove]*toMove < 0 && board[pieceSpace - 9*toMove] != NOBOARD) {
 				//Check for capture promotion
 				if (pieceSpace >= (56-(25*toMove)) && pieceSpace < (64-(25*toMove)))
-					Moves.add_promos(pieceSpace, pieceSpace - 9*toMove, board[pieceSpace - 9*toMove]);
+					Moves.add_promos(pieceSpace, pieceSpace - 9*toMove, board[pieceSpace - 9*toMove], toMove);
 				else {
 					int to =  pieceSpace - 9*toMove;
 					Moves.add_capture(pieceSpace, to, board[pieceSpace - 9*toMove]);
@@ -163,7 +163,7 @@ void Position::generateKingMoves(Movelist &Moves, int kingSpace) {
 }
 
 void Position::generateMoves(Movelist &Moves) {
-	int side;
+	unsigned int side;
 	if (toMove == WHITE) {
 		side = 0;
 		generateKingMoves(Moves, whiteKing);

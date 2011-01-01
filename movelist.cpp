@@ -20,9 +20,9 @@ void Movelist::add_move(int &from, int &to){
 	totalMoves++;
 }
 
-void Movelist::add_promos(int &from, int to, const int &cap){
+void Movelist::add_promos(int &from, int to, const int &cap, int side){
 	for (unsigned int i = 2; i < 6; i++){
-		Move newMove(from, to, currPiece, cap, false, 0, false, i);
+		Move newMove(from, to, currPiece, cap, false, 0, false, i*side);
 		list[totalMoves] = newMove;
 		totalMoves++;
 	}

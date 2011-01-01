@@ -36,7 +36,7 @@ class Position {
 
 	//Piecelist variables
 	
-	//The first index is for side. 0 for white, 1 for black. The second index for pieces
+	//The first index is for side. 0 for white, 1 for black. The second index is for pieces
 	//in the usual way.
 	unsigned int pieceLists[2][6][10];
 	unsigned int pieceListTotals[2][6];

@@ -29,8 +29,8 @@ class Movelist {
 		void add_move(int &, int &);
 		//Capture Move. Parameters: fromSpace, toSpace, captured piece
 		void add_capture(int &, int &, int &);
-		//Promotions. Parameters: fromSpace, toSpace, captured piece (0 if no capture)
-		void add_promos(int &, int, const int &);
+		//Promotions. Parameters: fromSpace, toSpace, captured piece (0 if no capture), side moving
+		void add_promos(int &, int, const int &, int);
 		//Castle moves. Parameters: castle number (1 king, 2 queen), side to move
 		void add_castle(int, int);
 		//Enpassant moves. Parameters: fromSpace, toSpace, side being captured

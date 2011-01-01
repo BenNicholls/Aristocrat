@@ -192,14 +192,15 @@ void Position::outputDetails() {
 
 void Position::updatePieceList(int fromSpace, int toSpace, int piece) {
 	if (abs(piece) != KING) {
-		int fromIndex, side;
-		if (fromSpace != 0) fromIndex = pieceIndexTable[fromSpace];
+		int side;
 		if (piece > 0) side = 0;
 		else side = 1;
 		if (fromSpace != 0) {
-				pieceListTotals[side][abs(piece)]--;
-				pieceLists[side][abs(piece)][fromIndex] = pieceLists[side][abs(piece)][pieceListTotals[side][abs(piece)]];
-				pieceIndexTable[pieceLists[side][abs(piece)][fromIndex]] = fromIndex;
+			int thePiece = abs(piece);
+			pieceListTotals[side][thePiece]--;
+			int delIndex = pieceIndexTable[fromSpace];
+			pieceLists[side][thePiece][delIndex] = pieceLists[side][thePiece][pieceListTotals[side][thePiece]];
+			pieceIndexTable[pieceLists[side][thePiece][delIndex]] = delIndex;
 		}
 		if (toSpace != 0) {
 				pieceLists[side][abs(piece)][pieceListTotals[side][abs(piece)]] = toSpace;
@@ -284,7 +285,7 @@ bool Position::doMove(Move &theMove) {
 	if (theMove.capture != 0) {
 		//For enpassant captures
 		if(theMove.enPassant == true) {
-			updatePieceList(enPassant + 10*toMove, 0, -PAWN*toMove);
+			updatePieceList(enPassant + 10*toMove, 0, theMove.capture);
 			updatePieceHash(enPassant + 10*toMove, 0, theMove.capture);
 			board[enPassant + 10*toMove] = EMPTY;
 		}
@@ -324,10 +325,10 @@ bool Position::doMove(Move &theMove) {
 
 	//For promotions, we must bring a piece to LIFE!
 	if (theMove.promotion != 0) {
-		board[theMove.toSpace] = theMove.promotion*toMove;
+		board[theMove.toSpace] = theMove.promotion;
 		updatePieceList(theMove.toSpace, 0, theMove.piece);
-		updatePieceList(0, theMove.toSpace, theMove.promotion*toMove);
-		updatePieceHash(0, theMove.toSpace, theMove.promotion*toMove);
+		updatePieceList(0, theMove.toSpace, theMove.promotion);
+		updatePieceHash(0, theMove.toSpace, theMove.promotion);
 		updatePieceHash(theMove.toSpace, 0, theMove.piece);
 	}
 	
@@ -429,14 +430,20 @@ void Position::undoMove() {
 
 	//Move piece back
 	board[theMove.fromSpace] = theMove.piece;
-	updatePieceList(theMove.toSpace, theMove.fromSpace, theMove.piece);
+	if (theMove.promotion == 0) {
+		updatePieceList(theMove.toSpace, theMove.fromSpace, theMove.piece);
+	}
+	else {
+		updatePieceList(theMove.toSpace, 0, theMove.promotion);
+		updatePieceList(0, theMove.fromSpace, theMove.piece);
+	}
 
 	//If a piece was captured, put it back, you!
 	if (theMove.capture != 0) {
 		//If it was an en passant capture
 		if (theMove.enPassant) {
-			board[theMove.toSpace + 10*toMove] = -PAWN*toMove;
-			updatePieceList(0, theMove.toSpace +10*toMove, -PAWN*toMove);
+			board[theMove.toSpace + 10*toMove] = theMove.capture;
+			updatePieceList(0, theMove.toSpace +10*toMove, theMove.capture);
 			board[theMove.toSpace] = EMPTY;
 		}
 		else {
