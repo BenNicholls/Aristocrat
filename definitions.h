@@ -29,7 +29,7 @@ const int KING = 6;
 
 const int PIECEVALUE[7] = { 0, 100, 300, 300, 500, 900, 10000 };
 
-const int INFINITY = 1000000;
+const int ANFINITY = 1000000;
 const int CHECKMATE = 40000;
 const int STALEMATE = 999998;
 const int BAD = 999997;
@@ -50,7 +50,7 @@ const int KNIGHTMOVES[8] = { -21, -19, -8, 12, 21, 19, 8, -12 };
 
 const int HASHTABLESIZE = 0x300000;
 
-const unsigned int pawnSpaceTable[120] = {0,0, 0, 0,  0,  0,  0,  0, 0, 0,
+const int pawnSpaceTable[120] = {0,0, 0, 0,  0,  0,  0,  0, 0, 0,
 										 0,0, 0, 0,  0,  0,  0,  0, 0, 0,
 										 0,0, 0, 0,  0,  0,  0,  0, 0, 0,
 										 0,5, 10,10, -40,-40,10, 10,5, 0,
@@ -63,7 +63,7 @@ const unsigned int pawnSpaceTable[120] = {0,0, 0, 0,  0,  0,  0,  0, 0, 0,
 										 0,0, 0, 0,  0,  0,  0,  0, 0, 0,
 										 0,0, 0, 0,  0,  0,  0,  0, 0, 0 };
 
-const unsigned int knightSpaceTable[120] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+const int knightSpaceTable[120] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0,-50,-40,-30,-30,-30,-30,-40,-50, 0,
 											0,-40,-20, 0, 5, 5, 0,-20,-40, 0,
@@ -76,7 +76,7 @@ const unsigned int knightSpaceTable[120] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-const unsigned int bishopSpaceTable[120] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+const int bishopSpaceTable[120] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0,-20,-10,-10,-10,-10,-10,-10,-20, 0,
 											0,-10, 5, 0, 0, 0, 0, 5,-10, 0,
@@ -89,7 +89,7 @@ const unsigned int bishopSpaceTable[120] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-const unsigned int rookSpaceTable[120] = {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+const int rookSpaceTable[120] = {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0, 0, 0, 0, 5, 5, 0, 0, 0, 0,
 											0, -5, 0, 0, 0, 0, 0, 0, -5, 0,
@@ -102,7 +102,7 @@ const unsigned int rookSpaceTable[120] = {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-const unsigned int queenSpaceTable[120] = {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+const int queenSpaceTable[120] = {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0,-20,-10,-10, -5, -5,-10,-10,-20, 0,
 											0,-10, 0, 5, 0, 0, 0, 0,-10, 0,
@@ -115,7 +115,7 @@ const unsigned int queenSpaceTable[120] = {  0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 											0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-const unsigned int kingSpaceTable[120] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+const int kingSpaceTable[120] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 										0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 										0, 20, 30, 10, 0, 0, 10, 30, 20, 0,
 										0, 20, 20, 0, 0, 0, 0, 20, 20, 0,

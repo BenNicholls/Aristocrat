@@ -275,7 +275,7 @@ Move ChessInterface::ifaceSearch(string parameter) {
 
 	Movelist Variation;
 	if (depth > 0) {
-		int score = Aristocrat.rootSearch(depth, -INFINITY, INFINITY, Variation);
+		int score = Aristocrat.rootSearch(depth, -ANFINITY, ANFINITY, Variation);
 		if (abs(score) == CHECKMATE) {
 			if (Variation.totalMoves > 0) {
 				cout << "Depth " << depth << ": Mate | ";
